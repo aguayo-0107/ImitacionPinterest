@@ -7,7 +7,7 @@ from uuid import uuid4
 
 app = FastAPI()
 
-if DB_CONNECTION_STRING is " " or None:
+if not DB_CONNECTION_STRING:
     raise ValueError("La variable de entorno DB_CONNECTION_STRING no está definida")
 
 app.add_middleware(

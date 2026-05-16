@@ -3,11 +3,11 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-HOST = os.getenv("HOST", "localhost")
-PORT = os.getenv("PORT", "5433")
-NAME = os.getenv("NAME", "bd_pinterest")
-USER = os.getenv("USER", "postgres")
-PASSWORD = os.getenv("PASSWORD", "password")
+HOST = os.getenv("DB_HOST")
+PORT = os.getenv("DB_PORT")
+NAME = os.getenv("DB_name")
+USER = os.getenv("DB_user")
+PASSWORD = os.getenv("DB_PASSWORD")
 
 DB_CONNECTION_STRING = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}"
 
