@@ -6,6 +6,7 @@ import userData from '../datos/usuarios.json';
 import boardData from '../datos/boards.json';
 import boardPin from '../datos/boardPin.json';
 import Mosaic from '../PinComponents/Mosaic.jsx';
+import Placeholder from '../assets/placeholder.png';
 
 function Update({type}) {
   const {id} = useParams();
@@ -175,7 +176,7 @@ function Update({type}) {
                 <div className="row g-0">
                 <div className="col-12 col-md-6">
                     <img 
-                    src={pines[0]?.url_imagen || "/placeholder.png"} 
+                    src={pines[0]?.url_imagen || Placeholder} 
                     className="detail-image" 
                     alt={"Imagen del tablero"} 
                     />

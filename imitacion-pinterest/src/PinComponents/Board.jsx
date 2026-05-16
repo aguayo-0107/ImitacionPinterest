@@ -1,5 +1,6 @@
 import pinData from '../datos/pines.json';
 import pinBoardData from '../datos/boardPin.json';
+import Placeholder from '../assets/placeholder.png';
 
 function Board({id, nombre, nav}) {
   const pinesEnTablero = pinBoardData.filter(bp => bp.tablero_id === id);
@@ -9,7 +10,7 @@ function Board({id, nombre, nav}) {
   return (
         <div className='card-container' style={{ cursor: 'pointer' }} onClick={nav}>
         <div key={id} className="card">
-          <img src={pines[0]?.url_imagen || '/placeholder.png'} className="card-image" alt={pines[0]?.descripcion || "No disponible"} />
+          <img src={pines[0]?.url_imagen || Placeholder} className="card-image" alt={pines[0]?.descripcion || "No disponible"} />
         </div>
         <div className="card-body">
             <h5 className="card-text">{nombre}</h5>

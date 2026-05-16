@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import Header from './GeneralComponents/Header.jsx'
 import Mosaic from './PinComponents/Mosaic.jsx'
 import PinDetail from './PinComponents/PinDetail.jsx'
@@ -20,7 +20,7 @@ import pinesData from './datos/pines.json';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <Header />
       
       <Routes>
@@ -44,7 +44,7 @@ createRoot(document.getElementById('root')).render(
         } />
         <Route path="*" element={<h2 className="text-center mt-5">404 - Página no encontrada</h2>} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>,
 )
 
