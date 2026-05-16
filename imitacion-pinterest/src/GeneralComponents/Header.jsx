@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { toggleTheme } from '../theme.js';
 import { NavLink } from 'react-router-dom';
+import Logo from '../assets/Logo.svg';
 
 function Header({nombre_de_usuario = "Visitante"}) {
   return (
@@ -8,7 +9,7 @@ function Header({nombre_de_usuario = "Visitante"}) {
         <nav className="navbar navbar-expand-lg bg-body-tertiary shadow-lg">
             <div className="container-fluid">
                 <NavLink className="navbar-brand" to="/">
-                    <img src="/Logo.svg" alt="Logo" style={{ width: "3.5rem", height: "3.5rem"}} className="d-inline-block align-text-top"/>
+                    <img src={Logo} alt="Logo" style={{ width: "3.5rem", height: "3.5rem"}} className="d-inline-block align-text-top"/>
                     Pinterest 2.0
                 </NavLink>
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
