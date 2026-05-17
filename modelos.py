@@ -43,7 +43,7 @@ class TableroRespuesta(BaseModel):
     id_tablero: str
     nombre_tablero: str
     id_usuario: str
-    posts: Optional[list[str]] = None
+    posts: Optional[list[dict]] = None
 
 class TableroActualizar(BaseModel):
     nombre_tablero: Optional[str] = Field(default=None, max_length=200)

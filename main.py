@@ -23,7 +23,7 @@ app.add_middleware(
 async def get_usuarios():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM Usuario;")
+            cur.execute("SELECT id, nombre_de_usuario, contrasena FROM Usuario;")
             datos = cur.fetchall()
             return datos
 
@@ -31,7 +31,7 @@ async def get_usuarios():
 async def get_posts():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM Post;")
+            cur.execute("SELECT id, descripcion, url_imagen, usuario_id FROM Post;")
             datos = cur.fetchall()
             return datos
         
@@ -39,7 +39,7 @@ async def get_posts():
 async def get_comentarios():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM Comentario;")
+            cur.execute("SELECT id, texto, post_id, usuario_id FROM Comentario;")
             datos = cur.fetchall()
             return datos
 
@@ -47,7 +47,7 @@ async def get_comentarios():
 async def get_tableros():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM Tablero;")
+            cur.execute("SELECT id, nombre, usuario_id FROM Tablero;")
             datos = cur.fetchall()
             return datos
 
@@ -55,7 +55,7 @@ async def get_tableros():
 async def get_posts_tablero(id_tablero: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM TableroPosts WHERE tablero_id = %s;", (id_tablero,))
+            cur.execute("SELECT post_id, tablero_id FROM TableroPosts WHERE tablero_id = %s;", (id_tablero,))
             datos = cur.fetchall()
             return datos
 
@@ -63,7 +63,7 @@ async def get_posts_tablero(id_tablero: str):
 async def get_tableros_usuario(id_usuario: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM Tablero WHERE usuario_id = %s;", (id_usuario,))
+            cur.execute("SELECT id, nombre, usuario_id FROM Tablero WHERE usuario_id = %s;", (id_usuario,))
             datos = cur.fetchall()
             return datos
         
@@ -71,7 +71,7 @@ async def get_tableros_usuario(id_usuario: str):
 async def get_comentarios_post(id_post: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM Comentario WHERE post_id = %s;", (id_post,))
+            cur.execute("SELECT id, texto, post_id, usuario_id FROM Comentario WHERE post_id = %s;", (id_post,))
             datos = cur.fetchall()
             return datos
         
@@ -202,7 +202,19 @@ async def actualizar_tablero(tablero_id: str, tablero: TableroActualizar, usuari
             # Obtenemos la lista de posts del tablero
             cur.execute("SELECT post_id FROM TableroPosts WHERE tablero_id = %s;", (tablero_id,))
             posts_tablero = cur.fetchall()
-            posts_lista_ret = [post[0] for post in posts_tablero]
+            posts_lista_ret = []
+            for post in posts_tablero:
+                cur.execute("SELECT descripcion, url_imagen, usuario_id FROM Post WHERE id = %s;", (post[0],))
+                res = cur.fetchall()
+                descripcion = res[0][0]
+                imagen_url = res[0][1]
+                usuario_id_post = res[0][2]
+                posts_lista_ret.append({
+                    "id_post": post[0],
+                    "descripcion": descripcion,
+                    "imagen_url": imagen_url,
+                    "id_usuario": usuario_id_post
+                })
             
             return {
                 "id_tablero": tablero_id, 
