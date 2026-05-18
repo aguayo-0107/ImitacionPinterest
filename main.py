@@ -4,15 +4,20 @@ from fastapi.middleware.cors import CORSMiddleware
 import psycopg
 from conexion import DB_CONNECTION_STRING
 from uuid import uuid4
+from datetime import datetime
+import requests
+import os
+from dotenv import load_dotenv
 
 app = FastAPI()
+load_dotenv()
 
 if not DB_CONNECTION_STRING:
     raise ValueError("La variable de entorno DB_CONNECTION_STRING no está definida")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,14 +32,65 @@ async def get_usuarios():
             datos = cur.fetchall()
             return datos
 
+@app.get("/usuarios/{id_usuario}")
+async def get_un_usuario(id_usuario: str):
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, nombre_de_usuario, contrasena FROM Usuario WHERE id = %s;", (id_usuario,))
+            datos = cur.fetchall()
+            if not datos:
+                raise HTTPException(status_code=404, detail="Usuario no encontrado")
+            return datos[0]
+
+#----------------POSTS------------------------
 @app.get("/posts")
 async def get_posts():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, descripcion, url_imagen, usuario_id FROM Post;")
+            cur.execute("SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post;")
             datos = cur.fetchall()
             return datos
+
+@app.get("/posts/{id_post}")
+async def get_un_post(id_post: str):
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE id = %s;", (id_post,))
+            datos = cur.fetchall()
+            if not datos:
+                raise HTTPException(status_code=404, detail="Post no encontrado")
+            return datos[0]
         
+@app.get("/posts/recientes")
+async def get_posts_recientes():
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, descripcion, url_imagen, usuario_id ORDER BY fecha DESC LIMIT 15;")
+            datos = cur.fetchall()
+            return datos
+
+@app.get("/posts/descubrir")
+async def get_posts_descubrir():
+    llave_acceso = os.getenv('UNSPLASH_KEY') #la llave está en .env
+    res = requests.get(
+        'https://api.unsplash.com/photos?per_page=15&order_by=latest', #regresa las 15 fotos más recientes
+        headers={
+            'Authorization': f'Client-ID {llave_acceso}'
+        }) 
+    posts = res.json()
+    ret_posts = []
+    for post in posts:
+        ret_posts.append(
+            {
+                'id_post': post['id'],
+                'descripcion': post['description'],
+                'imagen_url': post['links']['html'],
+                'fecha_creacion': post['created_at'],
+                'id_usuario': post['user']['id']
+            }
+        )
+    return ret_posts
+    
 @app.get("/comentarios")
 async def get_comentarios():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
@@ -43,6 +99,16 @@ async def get_comentarios():
             datos = cur.fetchall()
             return datos
 
+@app.get("/comentarios/{id_comentario}")
+async def get_un_comentario(id_comentario: str):
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, texto, post_id, usuario_id FROM Comentario WHERE id = %s;", (id_comentario,))
+            datos = cur.fetchall()
+            if not datos:
+                raise HTTPException(status_code=404, detail="Comentario no encontrado")
+            return datos[0]
+
 @app.get("/tableros")
 async def get_tableros():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
@@ -50,6 +116,16 @@ async def get_tableros():
             cur.execute("SELECT id, nombre, usuario_id FROM Tablero;")
             datos = cur.fetchall()
             return datos
+
+@app.get("/tableros/{id_tablero}")
+async def get_un_tablero(id_tablero: str):
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, nombre, usuario_id FROM Tablero WHERE id = %s;", (id_tablero,))
+            datos = cur.fetchall()
+            if not datos:
+                raise HTTPException(status_code=404, detail="Tablero no encontrado")
+            return datos[0]
 
 @app.get("/postsTablero/{id_tablero}")
 async def get_posts_tablero(id_tablero: str):
@@ -93,12 +169,13 @@ async def crear_post(post: PostCrear, usuario_id: str = Header(...)):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             id_post = str(uuid4())
-            cur.execute("INSERT INTO Post (id, descripcion, url_imagen, usuario_id) VALUES (%s, %s, %s, %s);", (id_post, post.descripcion, post.imagen_url, usuario_id))
+            cur.execute("INSERT INTO Post (id, descripcion, url_imagen, usuario_id, fecha) VALUES (%s, %s, %s, %s, %s);", (id_post, post.descripcion, post.imagen_url, usuario_id, post.fecha_creacion))
             conn.commit()
             return {
                 "id_post": id_post, 
                 "descripcion": post.descripcion,
                 "imagen_url": post.imagen_url,
+                "fecha_creacion": post.fecha_creacion,
                 "id_usuario": usuario_id
             }
 
@@ -141,18 +218,20 @@ async def actualizar_post(post_id: str, post: PostActualizar, usuario_id: str = 
                 conn.commit()
             
             # Obtenemos la información actualizada del post
-            cur.execute("SELECT descripcion, url_imagen FROM Post WHERE id = %s;", (post_id,))
+            cur.execute("SELECT descripcion, url_imagen, fecha FROM Post WHERE id = %s;", (post_id,))
             res = cur.fetchall()
             if not res:
                 raise HTTPException(status_code=404, detail="Post no encontrado")
             
             descripcion = res[0][0]
             imagen_url = res[0][1]
+            fecha = res[0][2]
             
             return {
                 "id_post": post_id, 
                 "descripcion": descripcion,
                 "imagen_url": imagen_url,
+                "fecha_creacion": fecha,
                 "id_usuario": usuario_id
             }
  
@@ -182,8 +261,9 @@ async def actualizar_tablero(tablero_id: str, tablero: TableroActualizar, usuari
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             # Primero agregamos el post al tablero
-            cur.execute("INSERT INTO TableroPosts(post_id, tablero_id) VALUES(%s, %s);", (tablero.id_post, tablero_id))
-            conn.commit()
+            if tablero.id_post is not None:
+                cur.execute("INSERT INTO TableroPosts(post_id, tablero_id) VALUES(%s, %s);", (tablero.id_post, tablero_id))
+                conn.commit()
             
             # Encontramos el nombre del tablero
             cur.execute("SELECT nombre FROM Tablero WHERE id = %s;", (tablero_id,))
@@ -204,14 +284,16 @@ async def actualizar_tablero(tablero_id: str, tablero: TableroActualizar, usuari
             posts_tablero = cur.fetchall()
             posts_lista_ret = []
             for post in posts_tablero:
-                cur.execute("SELECT descripcion, url_imagen, usuario_id FROM Post WHERE id = %s;", (post[0],))
+                cur.execute("SELECT descripcion, url_imagen, fecha, usuario_id FROM Post WHERE id = %s;", (post[0],))
                 res = cur.fetchall()
                 descripcion = res[0][0]
                 imagen_url = res[0][1]
-                usuario_id_post = res[0][2]
+                fecha_creacion = res[0][2]
+                usuario_id_post = res[0][3]
                 posts_lista_ret.append({
                     "id_post": post[0],
                     "descripcion": descripcion,
+                    "fecha_creacion": fecha_creacion,
                     "imagen_url": imagen_url,
                     "id_usuario": usuario_id_post
                 })

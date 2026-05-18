@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import datetime
 
 class UsuarioCrear(BaseModel):
     nombre_usuario: str = Field(min_length=5, max_length=200)
@@ -16,11 +17,13 @@ class UsuarioActualizar(BaseModel):
 class PostCrear(BaseModel):
     descripcion: Optional[str] = Field(default=None, max_length=500)
     imagen_url: str = Field(max_length=700)
+    fecha_creacion: datetime = Field(default_factory=datetime.now)
 
 class PostRespuesta(BaseModel):
     id_post: str
     descripcion: Optional[str]
     imagen_url: str
+    fecha_creacion: datetime
     id_usuario: str
 
 class PostActualizar(BaseModel):
