@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import userData from '../datos/usuarios.json';
+import * as Funciones from '../funciones.js';
 
+const listaUsuarios = await Funciones.getUsuarios();
+let userData = [];
+if (listaUsuarios[0]) {
+  userData = listaUsuarios[1].map(u => ({
+    id: u[0],
+    nombre_de_usuario: u[1],
+    contrasena: u[2]
+  }));
+}
+else {
+  alert("Error al comunicarse con el servidor.");
+  userData = [];
+}
 
 function Login () {
   const navigate = useNavigate();
