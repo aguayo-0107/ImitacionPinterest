@@ -20,10 +20,90 @@ export async function getUsuarios() {
     }
 }
 
+// Get /usuarios/{id_usuario}
+export async function getUsuarioPorId(id) {
+    try {
+        const response = await fetch(url_base + "/usuarios/" + id, {
+            method: "GET",
+            headers: {"Content-Type": "application/json"}
+        })
+        if (response.ok) {
+            const info = await response.json()
+            return [true, info]
+        } else {
+            const info = await response.text()
+            return [false, JSON.parse(info).detail[0].msg ?? JSON.parse(info).detail]
+        }
+    }
+    catch (error) {
+        return [false, error.message]
+    }
+}
+
 // Get /posts
 export async function getPosts() {
     try {
         const response = await fetch(url_base + "/posts", {
+            method: "GET",
+            headers: {"Content-Type": "application/json"}
+        })
+        if (response.ok) {
+            const info = await response.json()
+            return [true, info]
+        } else {
+            const info = await response.text()
+            return [false, JSON.parse(info).detail[0].msg ?? JSON.parse(info).detail]
+        }
+    }
+    catch (error) {
+        return [false, error.message]
+    }
+}
+
+// Get /posts/{id_post}
+export async function getPostPorId(id) {
+    try {
+        const response = await fetch(url_base + "/posts/" + id, {
+            method: "GET",
+            headers: {"Content-Type": "application/json"}
+        })
+        if (response.ok) {
+            const info = await response.json()
+            return [true, info]
+        } else {
+            const info = await response.text()
+            return [false, JSON.parse(info).detail[0].msg ?? JSON.parse(info).detail]
+        }
+    }
+    catch (error) {
+        return [false, error.message]
+    }
+}
+
+// Get /posts/recientes
+export async function getPostsRecientes() {
+    try {
+        const response = await fetch(url_base + "/posts/recientes", {
+            method: "GET",
+            headers: {"Content-Type": "application/json"}
+        })
+        if (response.ok) {
+            const info = await response.json()
+            return [true, info]
+        } else {
+            const info = await response.text()
+            return [false, JSON.parse(info).detail[0].msg ?? JSON.parse(info).detail]
+        }
+    }
+    catch (error) {
+        return [false, error.message]
+    }
+}
+
+// Get /posts/descubrir
+export async function getPostsDescubrir() {
+    try {
+        const response = await fetch(url_base + "/posts/descubrir", {
             method: "GET",
             headers: {"Content-Type": "application/json"}
         })
@@ -60,10 +140,50 @@ export async function getComentarios() {
     }
 }
 
+// Get /comentarios/{id_comentario}
+export async function getComentarioPorId(id) {
+    try {
+        const response = await fetch(url_base + "/comentarios/" + id, {
+            method: "GET",
+            headers: {"Content-Type": "application/json"}
+        })
+        if (response.ok) {
+            const info = await response.json()
+            return [true, info]
+        } else {
+            const info = await response.text()
+            return [false, JSON.parse(info).detail[0].msg ?? JSON.parse(info).detail]
+        }
+    }
+    catch (error) {
+        return [false, error.message]
+    }
+}
+
 // Get /tableros
 export async function getTableros() {
     try {
         const response = await fetch(url_base + "/tableros", {
+            method: "GET",
+            headers: {"Content-Type": "application/json"}
+        })
+        if (response.ok) {
+            const info = await response.json()
+            return [true, info]
+        } else {
+            const info = await response.text()
+            return [false, JSON.parse(info).detail[0].msg ?? JSON.parse(info).detail]
+        }
+    }
+    catch (error) {
+        return [false, error.message]
+    }
+}
+
+// Get /tableros/{id_tablero}
+export async function getTableroPorId(id) {
+    try {
+        const response = await fetch(url_base + "/tableros/" + id, {
             method: "GET",
             headers: {"Content-Type": "application/json"}
         })
@@ -167,7 +287,7 @@ export async function postPost(descripcion, imagen_url, usuario_id) {
         const response = await fetch(url_base + "/posts", {
             method: "POST",
             headers: {"Content-Type": "application/json", "usuario-id": usuario_id},
-            body: JSON.stringify({ descripcion, imagen_url })
+            body: JSON.stringify({ descripcion, imagen_url, fecha: new Date().toISOString() })
         })
         if (response.ok) {
             const info = await response.json()
