@@ -1,7 +1,7 @@
-const url_base = ""
+const url_base = "https://imitacionpinterest-api-vdgu.onrender.com"
 
 // Get /usuarios
-async function getUsuarios() {
+export async function getUsuarios() {
     try {
         const response = await fetch(url_base + "/usuarios", {
             method: "GET",
@@ -21,7 +21,7 @@ async function getUsuarios() {
 }
 
 // Get /posts
-async function getPosts() {
+export async function getPosts() {
     try {
         const response = await fetch(url_base + "/posts", {
             method: "GET",
@@ -41,7 +41,7 @@ async function getPosts() {
 }
 
 // Get /comentarios
-async function getComentarios() {
+export async function getComentarios() {
     try {
         const response = await fetch(url_base + "/comentarios", {
             method: "GET",
@@ -61,7 +61,7 @@ async function getComentarios() {
 }
 
 // Get /tableros
-async function getTableros() {
+export async function getTableros() {
     try {
         const response = await fetch(url_base + "/tableros", {
             method: "GET",
@@ -81,7 +81,7 @@ async function getTableros() {
 }
 
 // Get /postsTablero/id_tablero
-async function getPostsPorTablero(id) {
+export async function getPostsPorTablero(id) {
     try {
         const response = await fetch(url_base + "/postsTablero/" + id, {
             method: "GET",
@@ -101,7 +101,7 @@ async function getPostsPorTablero(id) {
 }
 
 // Get /tablerosUsuario/id_usuario
-async function getTablerosPorUsuario(id) {
+export async function getTablerosPorUsuario(id) {
     try {
         const response = await fetch(url_base + "/tablerosUsuario/" + id, {
             method: "GET",
@@ -121,7 +121,7 @@ async function getTablerosPorUsuario(id) {
 }
 
 // Get /comentariosPost/id_post
-async function getComentariosPorPost(id) {
+export async function getComentariosPorPost(id) {
     try {
         const response = await fetch(url_base + "/comentariosPost/" + id, {
             method: "GET",
@@ -141,7 +141,7 @@ async function getComentariosPorPost(id) {
 }
 
 // Post /usuarios (nombre_usuario, contrasena)
-async function postUsuario(nombre_usuario, contrasena) {
+export async function postUsuario(nombre_usuario, contrasena) {
     try {
         const response = await fetch(url_base + "/usuarios", {
             method: "POST",
@@ -162,7 +162,7 @@ async function postUsuario(nombre_usuario, contrasena) {
 }
 
 // Post /posts (descripcion, imagen_url, usuario-id [header])
-async function postPost(descripcion, imagen_url, usuario_id) {
+export async function postPost(descripcion, imagen_url, usuario_id) {
     try {
         const response = await fetch(url_base + "/posts", {
             method: "POST",
@@ -183,7 +183,7 @@ async function postPost(descripcion, imagen_url, usuario_id) {
 }
 
 // Post /posts/{post_id}/comentarios (contenido, usuario-id [header])
-async function postComentario(contenido, post_id, usuario_id) {
+export async function postComentario(contenido, post_id, usuario_id) {
     try {
         const response = await fetch(url_base + "/posts/" + post_id + "/comentarios", {
             method: "POST",
@@ -204,7 +204,7 @@ async function postComentario(contenido, post_id, usuario_id) {
 }
 
 // Post /tableros (nombre_tablero, usuario-id [header])
-async function postTablero(nombre_tablero, usuario_id) {
+export async function postTablero(nombre_tablero, usuario_id) {
     try {
         const response = await fetch(url_base + "/tableros", {
             method: "POST",
@@ -225,7 +225,7 @@ async function postTablero(nombre_tablero, usuario_id) {
 }
 
 // Patch /posts/{post_id} (descripcion, post_id, usuario-id [header])
-async function patchPost(descripcion, post_id, usuario_id) {
+export async function patchPost(descripcion, post_id, usuario_id) {
     try {
         const response = await fetch(url_base + "/posts/" + post_id, {
             method: "PATCH",
@@ -246,7 +246,7 @@ async function patchPost(descripcion, post_id, usuario_id) {
 }
 
 // Patch /usuarios/{id_usuario} (nombre, contrasena)
-async function patchUsuario(nombre_usuario, contrasena, id_usuario) {
+export async function patchUsuario(nombre_usuario, contrasena, id_usuario) {
     try {
         const response = await fetch(url_base + "/usuarios/" + id_usuario, {
             method: "PATCH",
@@ -267,7 +267,7 @@ async function patchUsuario(nombre_usuario, contrasena, id_usuario) {
 }
 
 // Patch /tableros/{tablero_id} (nombre_tablero, id_post, id usuario [header])
-async function patchTablero(nombre_tablero, id_post, tablero_id, usuario_id) {
+export async function patchTablero(nombre_tablero, id_post, tablero_id, usuario_id) {
     nombre_tablero = nombre_tablero === "" ? undefined : nombre_tablero
     try {
         const response = await fetch(url_base + "/tableros/" + tablero_id, {
@@ -289,7 +289,7 @@ async function patchTablero(nombre_tablero, id_post, tablero_id, usuario_id) {
 }
 
 // Delete /usuarios/{id_usuario}
-async function deleteUsuario(id_usuario) {
+export async function deleteUsuario(id_usuario) {
     try {
         const response = await fetch(url_base + "/usuarios/" + id_usuario, {
             method: "DELETE",
@@ -308,7 +308,7 @@ async function deleteUsuario(id_usuario) {
 }
 
 // Delete /posts/{id_post}
-async function deletePost(id_post) {
+export async function deletePost(id_post) {
     try {
         const response = await fetch(url_base + "/posts/" + id_post, {
             method: "DELETE",
@@ -327,7 +327,7 @@ async function deletePost(id_post) {
 }
 
 // Delete /tableros/{tablero_id}
-async function deleteTablero(id_tablero) {
+export async function deleteTablero(id_tablero) {
     try {
         const response = await fetch(url_base + "/tableros/" + id_tablero, {
             method: "DELETE",
@@ -346,7 +346,7 @@ async function deleteTablero(id_tablero) {
 }
 
 // Delete /comentarios/{comentario_id}
-async function deleteComentario(id_comentario) {
+export async function deleteComentario(id_comentario) {
     try {
         const response = await fetch(url_base + "/comentarios/" + id_comentario, {
             method: "DELETE",
