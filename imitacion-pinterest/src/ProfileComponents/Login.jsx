@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as Funciones from '../funciones.js';
+import { getUsuarios } from '../funciones.js';
 
-const listaUsuarios = await Funciones.getUsuarios();
+const listaUsuarios = await getUsuarios();
 let userData = [];
 if (listaUsuarios[0]) {
   userData = listaUsuarios[1].map(u => ({
