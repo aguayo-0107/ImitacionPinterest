@@ -76,12 +76,12 @@ function Create() {
   const handleCreateBoard = (e) => {
     e.preventDefault();
 
-    if (!session) {
+    if (!userSession) {
       alert('Debe iniciar sesión para crear un tablero.');
       navigate('/profile');
       return;
     }
-    postTablero(boardName, userId).then((data) => {
+    postTablero(boardName, userSession.id).then((data) => {
       if (data[0]) {
         alert(`¡Tablero "${boardName}" creado con éxito!`);
       } else {

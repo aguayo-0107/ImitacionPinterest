@@ -13,7 +13,7 @@ function Login () {
     getUsuario(username, password).then(usuario => {
       if (usuario[0] && usuario[1]) {
         console.log(usuario)
-        sessionStorage.setItem('user_session', JSON.stringify({ id: usuario[1].id, nombre_de_usuario: usuario[1].nombre_usuario }));
+        sessionStorage.setItem('user_session', JSON.stringify({ id: usuario[1].id, nombre_usuario: usuario[1].nombre_usuario }));
         navigate('/profile');
       }
       else {
