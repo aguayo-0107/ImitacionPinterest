@@ -20,6 +20,26 @@ export async function getUsuarios() {
     }
 }
 
+// Get /usuario (nombre_usuario, contrasena)
+export async function getUsuario(nombre_usuario, contrasena) {
+    try {
+        const response = await fetch(url_base + "/usuario?nombre_usuario=" + encodeURIComponent(nombre_usuario) + "&contrasena=" + encodeURIComponent(contrasena), {
+            method: "GET",
+            headers: {"Content-Type": "application/json"}
+        })
+        if (response.ok) {
+            const info = await response.json()
+            return [true, info]
+        } else {
+            const info = await response.text()
+            return [false, JSON.parse(info).detail[0].msg ?? JSON.parse(info).detail]
+        }
+    }
+    catch (error) {
+        return [false, error.message]
+    }
+}
+
 // Get /usuarios/{id_usuario}
 export async function getUsuarioPorId(id) {
     try {
