@@ -41,6 +41,7 @@ class ComentarioRespuesta(BaseModel):
     contenido: str
     id_post: str
     id_usuario: str
+    nombre_usuario: str
 
 class TableroCrear(BaseModel):
     nombre_tablero: str = Field(max_length=200)
