@@ -19,7 +19,7 @@ import './theme.js'
 import pinesData from './datos/pines.json';
 
 createRoot(document.getElementById('root')).render(
-  //<StrictMode>
+  <StrictMode>
     <HashRouter>
       <Header />
       
@@ -45,6 +45,6 @@ createRoot(document.getElementById('root')).render(
         <Route path="*" element={<h2 className="text-center mt-5">404 - Página no encontrada</h2>} />
       </Routes>
     </HashRouter>
-  //</StrictMode>,
+  </StrictMode>,
 )
 
