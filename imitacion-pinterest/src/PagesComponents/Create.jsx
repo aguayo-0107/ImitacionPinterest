@@ -17,7 +17,7 @@ function Create() {
   const [boardDescription, setBoardDescription] = useState('');
 
   useEffect(() => {
-    const session = localStorage.getItem('user_session');
+    const session = sessionStorage.getItem('user_session');
     if (session) {
       const parsedSession = JSON.parse(session);
       setUserSession(parsedSession);
