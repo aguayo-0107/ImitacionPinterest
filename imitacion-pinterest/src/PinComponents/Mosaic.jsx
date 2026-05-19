@@ -9,7 +9,7 @@ function Mosaic({posts}) {
       { posts !== undefined && posts[0] ? (
         <div className="cascade-grid">
           {posts.map(post => 
-            <Pin key={post[0]} id={post[0]} descripcion={post[1]} url_imagen={post[2]} nav={() => navigate(`/pin/${post[0]}`)}/>
+            <Pin key={post.id} id={post.id} descripcion={post.descripcion} url_imagen={post.imagen_url} nav={() => navigate(`/pin/${post.id}`)}/>
           )}
         </div>
       ) : (
