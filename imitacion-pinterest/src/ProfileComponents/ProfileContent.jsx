@@ -3,11 +3,12 @@ import Board from "../PinComponents/Board.jsx";
 import { useNavigate } from "react-router-dom";
 import { use, useEffect, useState } from "react";
 import { getTablerosUsuarioPaginados } from "../funciones.js";
+import BoardMosaic from "../PinComponents/BoardMosaic.jsx";
 
 function ProfileContent({user, pins, totalBoards, useState}) {
   const navigate = useNavigate();
 
-  const BOARDS_PER_PAGE = 4;
+  const BOARDS_PER_PAGE = 10;
   const [currentBoards, setCurrentBoards] = useState([]);
   const [currentBoardPage, setCurrentBoardPage] = useState(1);
   const totalBoardPages = Math.ceil(totalBoards / BOARDS_PER_PAGE);
@@ -17,19 +18,19 @@ function ProfileContent({user, pins, totalBoards, useState}) {
   const totalPinPages = Math.ceil(pins.length / PINS_PER_PAGE);
   const currentPins = pins.slice((currentPinPage - 1) * PINS_PER_PAGE, currentPinPage * PINS_PER_PAGE);
 
-  useEffect(() => {
-    const fetchBoards = async () => {
-      const data = await getTablerosUsuarioPaginados(currentBoardPage, BOARDS_PER_PAGE, user.id);
-      if (data[0]) {
-        setCurrentBoards(data[1]);
-      } else {
-        console.error("Error al obtener tableros del usuario:", data[1]);
-        alert("Error al conectar con el servidor.");
-      }
-    };
+  const fetchBoards = async () => {
+    const data = await getTablerosUsuarioPaginados(currentBoardPage, BOARDS_PER_PAGE, user.id);
+    if (data[0]) {
+      setCurrentBoards(data[1]);
+    } else {
+      console.error("Error al obtener tableros del usuario:", data[1]);
+      alert("Error al conectar con el servidor.");
+    }
+  };
 
+  useEffect(() => {
     fetchBoards();
-  }, []);
+  }, [currentBoardPage]);
 
   return (
     <div className="container py-5">
@@ -39,7 +40,7 @@ function ProfileContent({user, pins, totalBoards, useState}) {
         </div>
         <h1 className="h2 fw-bold mb-2">@{user.nombre_de_usuario}</h1>
         <div className="d-flex justify-content-center gap-3 text-muted small mb-3">
-          <span><strong>{}</strong> Tableros</span>
+          <span><strong>{totalBoards}</strong> Tableros</span>
           <span>•</span>
           <span><strong>{pins.length}</strong> Pines</span>
         </div>
@@ -62,9 +63,7 @@ function ProfileContent({user, pins, totalBoards, useState}) {
             </>
           ) : (
             <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-start">
-            {currentBoards.map((board) => (
-              <Board key={board.id} id={board.id} nombre={board.nombre_tablero} nav={() => navigate(`/modboard/${board.id}`)}/>
-            ))}
+            <BoardMosaic boards={currentBoards} />
             </div>
           )}
 

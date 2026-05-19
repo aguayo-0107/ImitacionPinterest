@@ -12,12 +12,10 @@ function ProfilePage() {
     return saved ? JSON.parse(saved) : null;
   });
   const isLoggedIn = !!userSession;
-  console.log("Cargando sesión de usuario desde sessionStorage:", userSession);
   
   useEffect(() => {
     if (!isLoggedIn) {
       navigate('/profile/login');
-      console.log('Usuario no autenticado');
     }
   }, [isLoggedIn, navigate]);
 

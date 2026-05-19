@@ -35,7 +35,6 @@ const Discover = () => {
         <h2 className="fw-bold mb-1">Descubrir</h2>
         <p className="text-muted small">Ideas aleatorias de Unsplash.</p>
       </div>
-      {console.log("Renderizando Discover con pines:", discoverPins)}
         <Mosaic posts={discoverPins} />
     </div>
   );

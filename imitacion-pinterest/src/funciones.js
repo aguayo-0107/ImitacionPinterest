@@ -263,10 +263,9 @@ export async function getTablerosPorUsuario(id) {
 // Get /tablerosUsuario/id_usuario
 export async function getTablerosUsuarioPaginados(pagina, limite, usuario_id) {
     try {
-        const response = await fetch(url_base + "/tableros/paginacion/", {
+        const response = await fetch(url_base + "/tableros/paginacion?pagina=" + pagina + "&limite=" + limite, {
             method: "GET",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ pagina, limite, usuario_id })
+            headers: {"Content-Type": "application/json", "usuario-id": usuario_id}
         })
         if (response.ok) {
             const info = await response.json()
