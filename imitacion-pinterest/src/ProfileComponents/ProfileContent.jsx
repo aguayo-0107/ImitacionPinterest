@@ -36,9 +36,9 @@ function ProfileContent({user, pins, totalBoards, useState}) {
     <div className="container py-5">
       <div className="profile-header text-center mb-5">
         <div className="author-avatar mx-auto mb-3">
-          {user.nombre_de_usuario.charAt(0).toUpperCase()}
+          {user.nombre_usuario.charAt(0).toUpperCase()}
         </div>
-        <h1 className="h2 fw-bold mb-2">@{user.nombre_de_usuario}</h1>
+        <h1 className="h2 fw-bold mb-2">@{user.nombre_usuario}</h1>
         <div className="d-flex justify-content-center gap-3 text-muted small mb-3">
           <span><strong>{totalBoards}</strong> Tableros</span>
           <span>•</span>
