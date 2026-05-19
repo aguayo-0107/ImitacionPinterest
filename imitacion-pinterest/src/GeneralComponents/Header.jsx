@@ -9,10 +9,11 @@ function Header() {
     const [nombre_de_usuario, set_nombre_de_usuario] = useState("Visitante");
     const navigate = useNavigate();
     useEffect(() => {
-        const session = localStorage.getItem('user_session');
-        const saved = localStorage.getItem('user_session');
+        const session = sessionStorage.getItem('user_session');
+        const saved = sessionStorage.getItem('user_session');
         set_nombre_de_usuario(saved ? JSON.parse(saved).nombre_de_usuario : "Visitante");
     }, [navigate]);
+    
   return (
     <>
         <nav className="navbar navbar-expand-lg bg-body-tertiary shadow-lg">
