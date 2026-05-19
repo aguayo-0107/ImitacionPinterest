@@ -29,9 +29,9 @@ function ProfilePage() {
       getTablerosPorUsuario(userSession?.id).then(data => {
         if (data[0]) {
           setUserBoards(data[1].map(u => ({
-            id: u[0],
-            nombre: u[1],
-            usuario_id: u[2]
+            id: u.id,
+            nombre_tablero: u.nombre_tablero,
+            usuario_id: u.id_usuario
           })));
         }
         else {
@@ -40,11 +40,11 @@ function ProfilePage() {
       });
       getPosts().then(data => {
         if (data[0]) {
-          setUserPin(data[1].filter(p => p[3] === userSession?.id).map(p => ({
-            id: p[0],
-            descripcion: p[1],
-            url_imagen: p[2],
-            usuario_id: p[3]
+          setUserPin(data[1].filter(p => p.id_usuario === userSession?.id).map(p => ({
+            id: p.id,
+            descripcion: p.descripcion,
+            url_imagen: p.imagen_url,
+            usuario_id: p.id_usuario
           })));
         }
         else {
