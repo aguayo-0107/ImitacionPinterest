@@ -8,11 +8,11 @@ import { getTablerosPorUsuario, getPosts } from '../funciones.js';
 function ProfilePage() {
   const navigate = useNavigate();
   const [userSession, setUserSession] = useState(() => {
-    const saved = localStorage.getItem('user_session');
+    const saved = sessionStorage.getItem('user_session');
     return saved ? JSON.parse(saved) : null;
   });
   const isLoggedIn = !!userSession;
-  console.log("Cargando sesión de usuario desde localStorage:", userSession);
+  console.log("Cargando sesión de usuario desde sessionStorage:", userSession);
   
   useEffect(() => {
     if (!isLoggedIn) {
