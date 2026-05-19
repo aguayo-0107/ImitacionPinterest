@@ -20,7 +20,7 @@ function Register () {
         } else {
           postUsuario(username.trim(), password ).then((data) => {
             if (data[0]) {
-              localStorage.setItem('user_session', JSON.stringify({ id: Date.now(), nombre_de_usuario: username.trim() }));
+              sessionStorage.setItem('user_session', JSON.stringify({ id: Date.now(), nombre_de_usuario: username.trim() }));
               navigate('/profile');
             }
             else {
@@ -34,6 +34,8 @@ function Register () {
         alert("Error al conectar con el servidor.");
       }
     });
+    sessionStorage.setItem('user_session', JSON.stringify({ id: Date.now(), nombre_de_usuario: username.trim() }));
+    navigate('/profile');
   };
 
   return (

@@ -30,7 +30,7 @@ function ProfileContent({ user, boards, pins, useState}) {
           <span><strong>{pins.length}</strong> Pines</span>
         </div>
         <button className="btn btn-outline-danger btn-sm rounded-pill px-3" onClick={() => {
-          localStorage.removeItem('user_session');
+          sessionStorage.removeItem('user_session');
           navigate('/profile/login');
         }}>
           Cerrar Sesión

@@ -28,7 +28,7 @@ function Login () {
       console.log("Usuario encontrado:", usuario);
 
       if (usuario !== "Desconocido" && password === usuario.contrasena) {
-          localStorage.setItem('user_session', JSON.stringify({ id: usuario.id, nombre_de_usuario: usuario.nombre_de_usuario }));
+          sessionStorage.setItem('user_session', JSON.stringify({ id: usuario.id, nombre_de_usuario: usuario.nombre_de_usuario }));
           navigate('/profile');
       } else {
           alert("Error: No se pudo iniciar sesión. Verifica tus credenciales e inténtalo de nuevo.");
