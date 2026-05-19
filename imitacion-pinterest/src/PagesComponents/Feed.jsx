@@ -33,7 +33,7 @@ function Feed() {
     cargarPosts();
   }, []);
 
-  return <Mosaic posts={posts} />;
+  return <Mosaic posts={posts[1]} />;
 }
 
 export default Feed;
