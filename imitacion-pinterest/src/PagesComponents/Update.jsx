@@ -34,7 +34,7 @@ function Update({type}) {
   const [tableroId, setTableroId] = useState('');
   const [nombre, setNombre] = useState('');
 
-  const userLog = JSON.parse(localStorage.getItem('user_session')) || null;
+  const userLog = JSON.parse(sessionStorage.getItem('user_session')) || null;
 
   useEffect(() => {
     if (type === "pin") {
@@ -45,22 +45,22 @@ function Update({type}) {
           setPin(pinData);
           
           // Verificar autenticación
-          if (userLog && pinData.usuario_id === userLog.id) {
+          if (userLog && pinData.id_usuario === userLog.id) {
             setAuth(true);
             
             // Cargar usuario
-            getUsuarioPorId(pinData.usuario_id).then((userData) => {
+            getUsuarioPorId(pinData.id_usuario).then((userData) => {
               if (userData[0]) {
                 setUsuario(userData[1]);
                 
                 // Cargar tableros del usuario
-                getTablerosPorUsuario(pinData.usuario_id).then((boardsData) => {
+                getTablerosPorUsuario(pinData.id_usuario).then((boardsData) => {
                   if (boardsData[0]) {
                     setUserBoards(boardsData[1]);
                     
                     // Encontrar el tablero actual del pin
                     const tableroDelPin = boardsData[1].find(b => 
-                      b.posts && b.posts.some(p => p.id === parseInt(id))
+                      b.posts && b.posts.some(p => p.id === id)
                     );
                     if (tableroDelPin) {
                       setTableroActual(tableroDelPin);
@@ -88,11 +88,11 @@ function Update({type}) {
           setBoard(boardData);
           
           // Verificar autenticación
-          if (userLog && boardData.usuario_id === userLog.id) {
+          if (userLog && boardData.id_usuario === userLog.id) {
             setAuth(true);
             
             // Cargar usuario
-            getUsuarioPorId(boardData.usuario_id).then((userData) => {
+            getUsuarioPorId(boardData.id_usuario).then((userData) => {
               if (userData[0]) {
                 setUsuario(userData[1]);
               }
@@ -122,7 +122,7 @@ function Update({type}) {
     
     // Actualizar descripción si cambió
     if (descripcion.trim() !== "" && descripcion !== pin.descripcion) {
-      const result = await patchPost(descripcion, parseInt(id), userLog.id);
+      const result = await patchPost(descripcion, id, userLog.id);
       if (!result[0]) {
         alert("Error al actualizar la descripción: " + result[1]);
         return;
@@ -131,7 +131,7 @@ function Update({type}) {
     
     // Actualizar tablero si cambió
     if (tableroId !== "" && tableroId !== tableroActual?.id) {
-      const result = await patchTablero("", parseInt(id), tableroId, userLog.id);
+      const result = await patchTablero("", id, tableroId, userLog.id);
       if (!result[0]) {
         alert("Error al cambiar de tablero: " + result[1]);
         return;
@@ -146,7 +146,7 @@ function Update({type}) {
     e.preventDefault();
     
     if (nombre.trim() !== "" && nombre !== board.nombre) {
-      const result = await patchTablero(nombre, undefined, parseInt(id), userLog.id);
+      const result = await patchTablero(nombre, undefined, id, userLog.id);
       if (!result[0]) {
         alert("Error al actualizar el tablero: " + result[1]);
         return;
@@ -158,7 +158,7 @@ function Update({type}) {
 
   const handleDeletePin = async () => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este pin?")) {
-      const result = await deletePost(parseInt(id));
+      const result = await deletePost(id);
       if (result[0]) {
         alert("Pin eliminado exitosamente");
         navigate('/');
@@ -170,7 +170,7 @@ function Update({type}) {
 
   const handleDeleteBoard = async () => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este tablero?")) {
-      const result = await deleteTablero(parseInt(id));
+      const result = await deleteTablero(id);
       if (result[0]) {
         alert("Tablero eliminado exitosamente");
         navigate('/');
@@ -248,14 +248,11 @@ function Update({type}) {
                   <select 
                     className="form-select" 
                     value={tableroId} 
-                    onChange={(e) => {
-                      const valorInstancia = e.target.value;
-                      setTableroId(valorInstancia === "" ? "" : parseInt(valorInstancia, 10));
-                    }}
+                    onChange={(e) => setTableroId(e.target.value)}
                   >
                     <option value="">Selecciona un tablero</option>
                     {userBoards.map(b => (
-                      <option key={b.id} value={b.id}>{b.nombre}</option>
+                      <option key={b.id} value={b.id}>{b.nombre_tablero}</option>
                     ))}
                   </select>
                 </div>
@@ -309,7 +306,7 @@ function Update({type}) {
                     <input 
                       type="text"
                       className="form-control"
-                      placeholder={board.nombre}
+                      placeholder={board.nombre_tablero}
                       value={nombre}
                       onChange={(e) => setNombre(e.target.value)}
                     />
