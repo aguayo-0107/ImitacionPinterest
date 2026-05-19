@@ -46,8 +46,7 @@ def tablero_row_to_json(row):
     return {
         "id": row[0],
         "nombre_tablero": row[1],
-        "id_usuario": row[2],
-        "posts": []
+        "id_usuario": row[2]
     }
 
 app.add_middleware(
@@ -99,19 +98,27 @@ async def get_posts():
 @app.get("/posts/descubrir", response_model=list[PostRespuesta])
 async def get_posts_descubrir():
     llave_acceso = os.getenv('UNSPLASH_KEY') #la llave está en .env
-    res = requests.get(
-        'https://api.unsplash.com/photos?per_page=15&order_by=latest', #regresa las 15 fotos más recientes
-        headers={
-            'Authorization': f'Client-ID {llave_acceso}'
-        }) 
+    if not llave_acceso:
+        raise HTTPException(status_code=500, detail="Unsplash key no configurada")
+    
+    try:
+        res = requests.get(
+            'https://api.unsplash.com/photos?per_page=15&order_by=latest', #regresa las 15 fotos más recientes
+            headers={
+                'Authorization': f'Client-ID {llave_acceso}'
+            }) 
+        res.raise_for_status()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Error conectando a Unsplash: {str(e)}")
+    
     posts = res.json()
     ret_posts = []
     for post in posts:
         ret_posts.append(
             {
                 'id': post['id'],
-                'descripcion': post.get('description'),
-                'imagen_url': post['links']['html'],
+                'descripcion': post.get('description') or post.get('alt_description'),
+                'imagen_url': post.get('urls', {}).get('regular') or post.get('links', {}).get('html'),
                 'fecha_creacion': post['created_at'],
                 'id_usuario': post['user']['id']
             }
@@ -254,8 +261,7 @@ async def crear_tablero(tablero: TableroCrear, usuario_id: str = Header(...)):
             return {
                 "id": id_tablero, 
                 "nombre_tablero": tablero.nombre_tablero,
-                "id_usuario": usuario_id,
-                "posts": []
+                "id_usuario": usuario_id
             }
             
 # PATCH
