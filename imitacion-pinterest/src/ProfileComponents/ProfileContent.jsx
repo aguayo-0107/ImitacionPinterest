@@ -1,21 +1,35 @@
 import PinSingle from "../PinComponents/PinSingle.jsx";
 import Board from "../PinComponents/Board.jsx";
 import { useNavigate } from "react-router-dom";
+import { use, useEffect, useState } from "react";
+import { getTablerosUsuarioPaginados } from "../funciones.js";
 
-function ProfileContent({ user, boards, pins, useState}) {
+function ProfileContent({user, pins, totalBoards, useState}) {
   const navigate = useNavigate();
 
   const BOARDS_PER_PAGE = 4;
-  const PINS_PER_PAGE = 10;
-
+  const [currentBoards, setCurrentBoards] = useState([]);
   const [currentBoardPage, setCurrentBoardPage] = useState(1);
+  const totalBoardPages = Math.ceil(totalBoards / BOARDS_PER_PAGE);
+
+  const PINS_PER_PAGE = 10;
   const [currentPinPage, setCurrentPinPage] = useState(1);
-
-  const totalBoardPages = Math.ceil(boards.length / BOARDS_PER_PAGE);
-  const currentBoards = boards.slice((currentBoardPage - 1) * BOARDS_PER_PAGE, currentBoardPage * BOARDS_PER_PAGE);
-
   const totalPinPages = Math.ceil(pins.length / PINS_PER_PAGE);
   const currentPins = pins.slice((currentPinPage - 1) * PINS_PER_PAGE, currentPinPage * PINS_PER_PAGE);
+
+  useEffect(() => {
+    const fetchBoards = async () => {
+      const data = await getTablerosUsuarioPaginados(currentBoardPage, BOARDS_PER_PAGE, user.id);
+      if (data[0]) {
+        setCurrentBoards(data[1]);
+      } else {
+        console.error("Error al obtener tableros del usuario:", data[1]);
+        alert("Error al conectar con el servidor.");
+      }
+    };
+
+    fetchBoards();
+  }, []);
 
   return (
     <div className="container py-5">
@@ -25,7 +39,7 @@ function ProfileContent({ user, boards, pins, useState}) {
         </div>
         <h1 className="h2 fw-bold mb-2">@{user.nombre_de_usuario}</h1>
         <div className="d-flex justify-content-center gap-3 text-muted small mb-3">
-          <span><strong>{boards.length}</strong> Tableros</span>
+          <span><strong>{}</strong> Tableros</span>
           <span>•</span>
           <span><strong>{pins.length}</strong> Pines</span>
         </div>

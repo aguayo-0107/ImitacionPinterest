@@ -58,9 +58,9 @@ function ProfilePage() {
     return (
       <>
         <ProfileContent 
-          user={userSession} 
-          boards={userBoards}
+          user={userSession}
           pins={userPin}
+          totalBoards={userBoards.length}
           useState={useState}
         />
       </>
