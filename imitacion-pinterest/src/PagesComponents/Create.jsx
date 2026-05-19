@@ -17,7 +17,7 @@ function Create() {
   const [boardDescription, setBoardDescription] = useState('');
 
   useEffect(() => {
-    const session = localStorage.getItem('user_session');
+    const session = sessionStorage.getItem('user_session');
     if (session) {
       const parsedSession = JSON.parse(session);
       setUserSession(parsedSession);
@@ -108,6 +108,7 @@ function Create() {
                     required
                   >
                     <option value="">Selecciona un tablero destino</option>
+                    <option value="">Ninguno</option>
                     {userBoards.map(board => (
                       <option key={board.id} value={board.id.toString()}>{board.nombre}</option>
                     ))}

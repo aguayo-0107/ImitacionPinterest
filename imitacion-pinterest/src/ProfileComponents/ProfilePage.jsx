@@ -3,19 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import Login from './Login.jsx'
 import Register from './Register.jsx'
 import ProfileContent from './ProfileContent.jsx'
-// Dummy data
-import pinesData from '../datos/pines.json';
-import userData from '../datos/usuarios.json';
-import boardData from '../datos/boards.json';
+import { getTablerosPorUsuario, getPosts } from '../funciones.js';
 
 function ProfilePage() {
   const navigate = useNavigate();
   const [userSession, setUserSession] = useState(() => {
-    const saved = localStorage.getItem('user_session');
+    const saved = sessionStorage.getItem('user_session');
     return saved ? JSON.parse(saved) : null;
   });
   const isLoggedIn = !!userSession;
-  console.log("Cargando sesión de usuario desde localStorage:", userSession);
+  console.log("Cargando sesión de usuario desde sessionStorage:", userSession);
   
   useEffect(() => {
     if (!isLoggedIn) {
@@ -24,10 +21,38 @@ function ProfilePage() {
     }
   }, [isLoggedIn, navigate]);
 
-  const userPin = pinesData.filter(pin => pin.usuario_id === userSession?.id);
-  const userBoards = boardData.filter(board => board.usuario_id === userSession?.id);
-  console.log("Pines del usuario:", userPin);
-  console.log("Tableros del usuario:", userBoards);
+  const [userPin, setUserPin] = useState([]);
+  const [userBoards, setUserBoards] = useState([]);
+  
+  useEffect(() => {
+    if (isLoggedIn) {
+      getTablerosPorUsuario(userSession?.id).then(data => {
+        if (data[0]) {
+          setUserBoards(data[1].map(u => ({
+            id: u[0],
+            nombre: u[1],
+            usuario_id: u[2]
+          })));
+        }
+        else {
+          console.error("Error al obtener tableros del usuario:", data[1]);
+        }
+      });
+      getPosts().then(data => {
+        if (data[0]) {
+          setUserPin(data[1].filter(p => p[3] === userSession?.id).map(p => ({
+            id: p[0],
+            descripcion: p[1],
+            url_imagen: p[2],
+            usuario_id: p[3]
+          })));
+        }
+        else {
+          console.error("Error al obtener pines del usuario:", data[1]);
+        }
+      });
+    }
+  }, [isLoggedIn, userSession?.id]);
 
   if (isLoggedIn) {
     return (

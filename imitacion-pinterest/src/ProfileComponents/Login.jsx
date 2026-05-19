@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import userData from '../datos/usuarios.json';
-
+import { getUsuarios } from '../funciones.js';
 
 function Login () {
   const navigate = useNavigate();
@@ -12,15 +11,29 @@ function Login () {
     e.preventDefault();
     // Se supone que aqui checamos bien si funciono con la BD
     console.log("Intentando iniciar sesión con:", { username, password });
-    const usuario = userData.find(u => u.nombre_de_usuario === username.trim()) || "Desconocido";
-    console.log("Usuario encontrado:", usuario);
+    getUsuarios().then(listaUsuarios => {
+      let userData = [];
+      if (listaUsuarios[0]) {
+        userData = listaUsuarios[1].map(u => ({
+          id: u[0],
+          nombre_de_usuario: u[1],
+          contrasena: u[2]
+        }));
+      }
+      else {
+        alert("Error al comunicarse con el servidor.");
+        userData = [];
+      }
+      const usuario = userData.find(u => u.nombre_de_usuario === username.trim()) || "Desconocido";
+      console.log("Usuario encontrado:", usuario);
 
-    if (usuario !== "Desconocido" && password === usuario.contrasena) {
-        localStorage.setItem('user_session', JSON.stringify({ id: usuario.id, nombre_de_usuario: usuario.nombre_de_usuario }));
-        navigate('/profile');
-    } else {
-        alert("Error: No se pudo iniciar sesión. Verifica tus credenciales e inténtalo de nuevo.");
-    }
+      if (usuario !== "Desconocido" && password === usuario.contrasena) {
+          sessionStorage.setItem('user_session', JSON.stringify({ id: usuario.id, nombre_de_usuario: usuario.nombre_de_usuario }));
+          navigate('/profile');
+      } else {
+          alert("Error: No se pudo iniciar sesión. Verifica tus credenciales e inténtalo de nuevo.");
+      }
+    })
   };
 
   return (
