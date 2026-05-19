@@ -95,6 +95,17 @@ async def get_posts():
             cur.execute("SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post;")
             datos = cur.fetchall()
             return [post_row_to_json(row) for row in datos]
+        
+@app.get("/posts/recientes", response_model=list[PostRespuesta])
+async def get_posts_recientes(fecha_creacion: datetime):
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE fecha > %s LIMIT 15;",
+                (fecha_creacion,)
+            )
+            datos = cur.fetchall()
+            return [post_row_to_json(row) for row in datos]
 
 @app.get("/posts/descubrir", response_model=list[PostRespuesta])
 async def get_posts_descubrir():
@@ -135,17 +146,6 @@ async def get_un_post(id_post: str):
             if not datos:
                 raise HTTPException(status_code=404, detail="Post no encontrado")
             return post_row_to_json(datos[0])
-        
-@app.get("/posts/recientes", response_model=list[PostRespuesta])
-async def get_posts_recientes(fecha_creacion: datetime):
-    with psycopg.connect(DB_CONNECTION_STRING) as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE fecha > %s LIMIT 15;",
-                (fecha_creacion,)
-            )
-            datos = cur.fetchall()
-            return [post_row_to_json(row) for row in datos]
     
 @app.get("/comentarios", response_model=list[ComentarioRespuesta])
 async def get_comentarios():
