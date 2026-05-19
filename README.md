@@ -60,13 +60,11 @@ El backend en Python maneja la lógica de negocio y los endpoints. Por cuestione
 ```
 ---
 ## Enlace a página web del cliente
-Accede a la aplicación en vivo a través del siguiente enlace:
-[URL]
+Accede a la aplicación en vivo a través del siguiente enlace: 
+https://aguayo-0107.github.io/ImitacionPinterest/
 ---
 ## Enlace al health endpoint
 El health endpoint verifica el estado de la aplicación, incluyendo la conectividad con la base de datos PostgreSQL y la API de Unsplash. Puedes consultarlo en:
 https://imitacionpinterest-api-vdgu.onrender.com/health
 ---
-## Live demo
-Observa una demostración en vivo del proyecto:
-[URL]
+
