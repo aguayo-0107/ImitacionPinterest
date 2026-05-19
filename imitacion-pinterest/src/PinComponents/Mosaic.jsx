@@ -1,20 +1,22 @@
 import Pin from "./PinSingle";
-import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
-function Mosaic({pins}) {
+function Mosaic({posts}) {
     const navigate = useNavigate();
-    useEffect(() => {
-        //Aqui tenemos que implementar lo de que baje pines y los guarde en localStorage
-    },[]);
     
     return (
-    <div className="cascade-grid">
-        {pins.map(pin => 
-            <Pin key={pin.id} id={pin.id} descripcion={pin.descripcion} url_imagen={pin.url_imagen} nav={() => navigate(`/pin/${pin.id}`)}/>
-        )}
-    </div>
-    )
+    <>
+      { posts !== undefined && posts[0] ? (
+        <div className="cascade-grid">
+          {posts.map(post => 
+            <Pin key={post.id} id={post.id} descripcion={post.descripcion} url_imagen={post.url_imagen} nav={() => navigate(`/pin/${post.id}`)}/>
+          )}
+        </div>
+      ) : (
+        <h2 className="text-center mt-5">No hay pines para mostrar</h2>
+      )}
+    </>
+  );
 }
 
 export default Mosaic;
