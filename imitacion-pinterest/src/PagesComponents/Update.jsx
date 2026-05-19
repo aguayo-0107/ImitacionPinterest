@@ -34,7 +34,7 @@ function Update({type}) {
   const [tableroId, setTableroId] = useState('');
   const [nombre, setNombre] = useState('');
 
-  const userLog = JSON.parse(localStorage.getItem('user_session')) || null;
+  const userLog = JSON.parse(sessionStorage.getItem('user_session')) || null;
 
   useEffect(() => {
     if (type === "pin") {
@@ -45,16 +45,15 @@ function Update({type}) {
           setPin(pinData);
           
           // Verificar autenticación
-          if (userLog && pinData.usuario_id === userLog.id) {
+          if (userLog && pinData.id_usuario === userLog.id) {
             setAuth(true);
-            
             // Cargar usuario
-            getUsuarioPorId(pinData.usuario_id).then((userData) => {
+            getUsuarioPorId(pinData.id_usuario).then((userData) => {
               if (userData[0]) {
                 setUsuario(userData[1]);
                 
                 // Cargar tableros del usuario
-                getTablerosPorUsuario(pinData.usuario_id).then((boardsData) => {
+                getTablerosPorUsuario(pinData.id_usuario).then((boardsData) => {
                   if (boardsData[0]) {
                     setUserBoards(boardsData[1]);
                     
@@ -88,11 +87,11 @@ function Update({type}) {
           setBoard(boardData);
           
           // Verificar autenticación
-          if (userLog && boardData.usuario_id === userLog.id) {
+          if (userLog && boardData.id_usuario === userLog.id) {
             setAuth(true);
             
             // Cargar usuario
-            getUsuarioPorId(boardData.usuario_id).then((userData) => {
+            getUsuarioPorId(boardData.id_usuario).then((userData) => {
               if (userData[0]) {
                 setUsuario(userData[1]);
               }
@@ -122,7 +121,7 @@ function Update({type}) {
     
     // Actualizar descripción si cambió
     if (descripcion.trim() !== "" && descripcion !== pin.descripcion) {
-      const result = await patchPost(descripcion, parseInt(id), userLog.id);
+      const result = await patchPost(descripcion, pin.id, userLog.id);
       if (!result[0]) {
         alert("Error al actualizar la descripción: " + result[1]);
         return;
@@ -131,7 +130,7 @@ function Update({type}) {
     
     // Actualizar tablero si cambió
     if (tableroId !== "" && tableroId !== tableroActual?.id) {
-      const result = await patchTablero("", parseInt(id), tableroId, userLog.id);
+      const result = await patchTablero("", pin.id, tableroId, userLog.id);
       if (!result[0]) {
         alert("Error al cambiar de tablero: " + result[1]);
         return;
@@ -144,9 +143,9 @@ function Update({type}) {
 
   const handleSubmitBoard = async (e) => {
     e.preventDefault();
-    
-    if (nombre.trim() !== "" && nombre !== board.nombre) {
-      const result = await patchTablero(nombre, undefined, parseInt(id), userLog.id);
+    if (nombre.trim() !== "" && nombre !== board.nombre_tablero) {
+      console.log("Intentando actualizar tablero con nombre:", nombre, board.id, userLog.id);
+      const result = await patchTablero(nombre, "", board.id, userLog.id);
       if (!result[0]) {
         alert("Error al actualizar el tablero: " + result[1]);
         return;
@@ -244,18 +243,15 @@ function Update({type}) {
                     onChange={(e) => setDescripcion(e.target.value)}
                   />
                   
-                  <label className="form-label small fw-bold mt-3">Tablero del pin</label>
+                  <label className="form-label small fw-bold mt-3">Agrega el pin al tablero</label>
                   <select 
                     className="form-select" 
                     value={tableroId} 
-                    onChange={(e) => {
-                      const valorInstancia = e.target.value;
-                      setTableroId(valorInstancia === "" ? "" : parseInt(valorInstancia, 10));
-                    }}
+                    onChange={(e) => {setTableroId(e.target.value) }}
                   >
                     <option value="">Selecciona un tablero</option>
                     {userBoards.map(b => (
-                      <option key={b.id} value={b.id}>{b.nombre}</option>
+                      <option key={b.id} value={b.id}>{b.nombre_tablero}</option>
                     ))}
                   </select>
                 </div>

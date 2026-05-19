@@ -260,6 +260,26 @@ export async function getTablerosPorUsuario(id) {
     }
 }
 
+// Get /tablerosUsuario/id_usuario
+export async function getTablerosUsuarioPaginados(pagina, limite, usuario_id) {
+    try {
+        const response = await fetch(url_base + "/tableros/paginacion?pagina=" + pagina + "&limite=" + limite, {
+            method: "GET",
+            headers: {"Content-Type": "application/json", "usuario-id": usuario_id}
+        })
+        if (response.ok) {
+            const info = await response.json()
+            return [true, info]
+        } else {
+            const info = await response.text()
+            return [false, JSON.parse(info).detail[0].msg ?? JSON.parse(info).detail]
+        }
+    }
+    catch (error) {
+        return [false, error.message]
+    }
+}
+
 // Get /comentariosPost/id_post
 export async function getComentariosPorPost(id) {
     try {
