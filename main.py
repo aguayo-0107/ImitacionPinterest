@@ -85,7 +85,7 @@ async def get_un_usuario_nom_usuario(nombre_usuario: str, contrasena: str):
             datos = cur.fetchall()
             if not datos:
                 raise HTTPException(status_code=404, detail="Usuario no encontrado")
-            return usuario_row_to_json(datos[0])
+            return usuario_row_to_json(len(datos) > 0 and datos[0] or None)
 
 #----------------POSTS------------------------
 @app.get("/posts", response_model=list[PostRespuesta])
@@ -137,12 +137,12 @@ async def get_un_post(id_post: str):
             return post_row_to_json(datos[0])
         
 @app.get("/posts/recientes", response_model=list[PostRespuesta])
-async def get_posts_recientes(post_reciente: PostReciente):
+async def get_posts_recientes(fecha_creacion: datetime):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE fecha > %s LIMIT 15;",
-                (post_reciente.fecha_creacion,)
+                (fecha_creacion,)
             )
             datos = cur.fetchall()
             return [post_row_to_json(row) for row in datos]
@@ -350,7 +350,7 @@ async def actualizar_tablero(tablero_id: str, tablero: TableroActualizar, usuari
             nombre_tablero = res[0][0]
             
             # Si se actualiza el nombre del tablero
-            if tablero.nombre_tablero is not None:
+            if tablero.nombre_tablero is not None and tablero.nombre_tablero != '':
                 nombre_tablero = tablero.nombre_tablero
                 cur.execute("UPDATE Tablero SET nombre = %s WHERE id = %s;", (nombre_tablero, tablero_id))
                 conn.commit()
