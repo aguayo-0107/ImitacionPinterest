@@ -100,10 +100,10 @@ export async function getPostPorId(id) {
     }
 }
 
-// Get /posts/recientes
-export async function getPostsRecientes() {
+// Get /posts/recientes (fecha_creacion [param])
+export async function getPostsRecientes(fecha_creacion) {
     try {
-        const response = await fetch(url_base + "/posts/recientes", {
+        const response = await fetch(url_base + "/posts/recientes?fecha_creacion=" + encodeURIComponent(fecha_creacion), {
             method: "GET",
             headers: {"Content-Type": "application/json"}
         })
