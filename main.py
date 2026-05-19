@@ -38,7 +38,8 @@ def comentario_row_to_json(row):
         "id": row[0],
         "contenido": row[1],
         "id_post": row[2],
-        "id_usuario": row[3]
+        "id_usuario": row[3],
+        "nombre_usuario": row[4]
     }
 
 
@@ -117,8 +118,8 @@ async def get_posts_descubrir():
         ret_posts.append(
             {
                 'id': post['id'],
-                'descripcion': post.get('description') or post.get('alt_description'),
-                'imagen_url': post.get('urls', {}).get('regular') or post.get('links', {}).get('html'),
+                'descripcion': post.get('description'),
+                'imagen_url': post.get('urls', {}).get('regular'),
                 'fecha_creacion': post['created_at'],
                 'id_usuario': post['user']['id']
             }
@@ -150,7 +151,7 @@ async def get_posts_recientes(post_reciente: PostReciente):
 async def get_comentarios():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, texto, post_id, usuario_id FROM Comentario;")
+            cur.execute("SELECT Comentario.id, Comentario.texto, Comentario.post_id, Comentario.usuario_id, Usuario.nombre_de_usuario FROM Comentario JOIN Usuario ON Comentario.usuario_id = Usuario.id;")
             datos = cur.fetchall()
             return [comentario_row_to_json(row) for row in datos]
 
@@ -158,11 +159,25 @@ async def get_comentarios():
 async def get_un_comentario(id_comentario: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, texto, post_id, usuario_id FROM Comentario WHERE id = %s;", (id_comentario,))
+            cur.execute("SELECT Comentario.id, Comentario.texto, Comentario.post_id, Comentario.usuario_id, Usuario.nombre_de_usuario FROM Comentario JOIN Usuario ON Comentario.usuario_id = Usuario.id WHERE Comentario.id = %s;", (id_comentario,))
             datos = cur.fetchall()
             if not datos:
                 raise HTTPException(status_code=404, detail="Comentario no encontrado")
             return comentario_row_to_json(datos[0])
+        
+@app.get("/tableros/paginacion", response_model=list[TableroRespuesta])
+async def get_tableros_pag(
+    pagina: int = 1,
+    limite: int = 8
+):
+    offset = (pagina - 1) * limite
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, nombre, usuario_id FROM Tablero LIMIT %s OFFSET %s;",
+                (limite, offset)
+            )
+            return [tablero_row_to_json(row) for row in cur.fetchall()]
 
 @app.get("/tableros", response_model=list[TableroRespuesta])
 async def get_tableros():
@@ -205,7 +220,7 @@ async def get_tableros_usuario(id_usuario: str):
 async def get_comentarios_post(id_post: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, texto, post_id, usuario_id FROM Comentario WHERE post_id = %s;", (id_post,))
+            cur.execute("SELECT Comentario.id, Comentario.texto, Comentario.post_id, Comentario.usuario_id, Usuario.nombre_de_usuario FROM Comentario JOIN Usuario ON Comentario.usuario_id = Usuario.id WHERE Comentario.post_id = %s;", (id_post,))
             datos = cur.fetchall()
             return [comentario_row_to_json(row) for row in datos]
         
@@ -244,11 +259,15 @@ async def crear_comentario(comentario: ComentarioCrear, post_id: str, usuario_id
             id_comentario = str(uuid4())
             cur.execute("INSERT INTO Comentario (id, texto, post_id, usuario_id) VALUES (%s, %s, %s, %s);", (id_comentario, comentario.contenido, post_id, usuario_id))
             conn.commit()
+            # Get the nombre_usuario
+            cur.execute("SELECT nombre_de_usuario FROM Usuario WHERE id = %s;", (usuario_id,))
+            nombre_usuario = cur.fetchall()[0][0]
             return {
                 "id": id_comentario, 
                 "contenido": comentario.contenido,
                 "id_post": post_id,
-                "id_usuario": usuario_id
+                "id_usuario": usuario_id,
+                "nombre_usuario": nombre_usuario
             }
 
 @app.post("/tableros", status_code=201, response_model=TableroRespuesta)
