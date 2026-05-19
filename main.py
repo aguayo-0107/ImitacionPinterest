@@ -337,3 +337,36 @@ async def eliminar_comentario(id_comentario: str):
             conn.commit()
             
 
+# HEALTH 
+@app.get("/health")
+async def health():
+    # Verifica la base de datos
+    try:
+        with psycopg.connect(DB_CONNECTION_STRING) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1;")
+        db_status = "ok"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+
+    # Verifica la API de Unsplash
+    try:
+        llave_acceso = os.getenv('UNSPLASH_KEY')
+        res = requests.get(
+            'https://api.unsplash.com/photos?per_page=1',
+            headers={'Authorization': f'Client-ID {llave_acceso}'}
+        )
+        unsplash_status = "ok" if res.status_code == 200 else f"error: {res.status_code}"
+    except Exception as e:
+        unsplash_status = f"error: {str(e)}"
+
+    todo_ok = db_status == "ok" and unsplash_status == "ok"
+
+    return {
+        "status":    "ok" if todo_ok else "degraded",
+        "timestamp": datetime.now().isoformat(),
+        "services": {
+            "database": db_status,
+            "unsplash": unsplash_status
+        }
+    }
