@@ -291,3 +291,98 @@ body {
     font-size: 0.9rem;
     vertical-align: baseline;
 }
+
+/* ── Board card ── */
+.board-card {
+    height: fit-content;
+    max-width: 18rem;
+    position: relative;
+    cursor: zoom-in;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Página 3 – la más atrás */
+.board-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: var(--border-radius-lg);
+    transform: rotate(-4deg) translateY(6px) translateX(-4px);
+    z-index: 0;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Página 2 – en medio */
+.board-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.32);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: var(--border-radius-lg);
+    transform: rotate(-2deg) translateY(3px) translateX(-2px);
+    z-index: 1;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Página 1 – el card principal (va dentro con .board-card-inner) */
+.board-card .board-card-inner {
+    position: relative;
+    z-index: 2;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Hover – el inner sube */
+.board-card:hover .board-card-inner {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover – las páginas de atrás se abren más */
+.board-card:hover::before {
+    transform: rotate(-6deg) translateY(12px) translateX(-7px);
+}
+
+.board-card:hover::after {
+    transform: rotate(-3deg) translateY(6px) translateX(-4px);
+}
+
+.board-card .card-image {
+    width: 100%;
+    max-width: 20rem;
+    height: auto;
+    display: block;
+    transition: all 0.5s ease;
+}
+
+.board-card:hover .card-image {
+    filter: brightness(0.9);
+    transform: scale(1.03);
+}
+
+.board-card .card-body {
+    margin-top: 0.1rem;
+    margin-bottom: 1rem;
+    padding: 12px;
+    text-align: left;
+    font: 1em sans-serif;
+    font-weight: bold;
+    color: var(--text-dark);
+    background: transparent;
+}
+
+.board-card .card-text {
+    font-size: 1.1em;
+    font-weight: bolder;
+    color: var(--text-dark);
+}

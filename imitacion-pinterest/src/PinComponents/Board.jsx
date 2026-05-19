@@ -19,9 +19,11 @@ function Board({id, nombre}) {
   }, [id, nombre]);
 
   return (
-        <div className='card-container' style={{ cursor: 'pointer' }} onClick={() => navigate(`/modboard/${id}`)}>
-        <div key={id} className="card">
+        <div style={{ cursor: 'pointer' }} onClick={() => navigate(`/modboard/${id}`)}>
+        <div key={id} className="board-card">
+          <div className="board-card-inner">
           <img src={pines[0]?.imagen_url || Placeholder} className="card-image" alt={pines[0]?.descripcion || "No disponible"} />
+          </div>
         </div>
         <div className="card-body">
             <h5 className="card-text">{nombre}</h5>
