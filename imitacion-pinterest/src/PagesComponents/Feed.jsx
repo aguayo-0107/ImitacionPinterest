@@ -15,14 +15,17 @@ function Feed() {
 
       let posts;
 
-      if (postsGuardados && timestampGuardado && postsGuardados !== "undefined" && timestampGuardado !== "undefined") {
+      if (postsGuardados && timestampGuardado) {
         const cache  = JSON.parse(postsGuardados);
         const nuevos = await getPostsRecientes(timestampGuardado);
-        posts = nuevos[0] ? [...nuevos, ...cache] : cache
+        console.log("Posts en cache:", cache);
+        console.log("Posts nuevos desde el servidor:", nuevos);
+        posts = [true, nuevos[0] ? [...nuevos[1], ...cache] : cache];
+        console.log("Posts combinados:", posts);
       } else {
         posts = await getPosts();
       }
-      if (posts) {
+      if (posts[0]) {
         localStorage.setItem(STORAGE_KEY_POSTS,     JSON.stringify(posts[1]));
         localStorage.setItem(STORAGE_KEY_TIMESTAMP, new Date().toISOString());
         setPosts(posts);
