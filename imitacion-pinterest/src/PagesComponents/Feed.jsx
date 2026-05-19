@@ -18,7 +18,7 @@ function Feed() {
       if (postsGuardados && timestampGuardado && postsGuardados !== "undefined" && timestampGuardado !== "undefined") {
         const cache  = JSON.parse(postsGuardados);
         const nuevos = await getPostsRecientes(timestampGuardado);
-        posts = nuevos[0] && nuevos[1] ? [...nuevos[1], ...cache] : cache;
+        posts = nuevos[0] ? [...nuevos, ...cache] : cache
       } else {
         posts = await getPosts();
       }
