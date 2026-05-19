@@ -18,7 +18,10 @@ class PostCrear(BaseModel):
     descripcion: Optional[str] = Field(default=None, max_length=500)
     imagen_url: str = Field(max_length=700)
     fecha_creacion: datetime = Field(default_factory=datetime.now)
-
+    
+class PostReciente(BaseModel):
+    fecha_creacion: datetime
+    
 class PostRespuesta(BaseModel):
     id_post: str
     descripcion: Optional[str]
