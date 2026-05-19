@@ -96,28 +96,7 @@ async def get_posts():
             datos = cur.fetchall()
             return [post_row_to_json(row) for row in datos]
 
-@app.get("/posts/{id_post}", response_model=PostRespuesta)
-async def get_un_post(id_post: str):
-    with psycopg.connect(DB_CONNECTION_STRING) as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE id = %s;", (id_post,))
-            datos = cur.fetchall()
-            if not datos:
-                raise HTTPException(status_code=404, detail="Post no encontrado")
-            return post_row_to_json(datos[0])
-        
-@app.get("/posts/recientes", response_model=list[PostRespuesta])
-async def get_posts_recientes(post_reciente: PostReciente):
-    with psycopg.connect(DB_CONNECTION_STRING) as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE fecha > %s LIMIT 15;",
-                (post_reciente.fecha_creacion,)
-            )
-            datos = cur.fetchall()
-            return [post_row_to_json(row) for row in datos]
-
-@app.get("/posts/descubrir")
+@app.get("/posts/descubrir", response_model=list[PostRespuesta])
 async def get_posts_descubrir():
     llave_acceso = os.getenv('UNSPLASH_KEY') #la llave está en .env
     res = requests.get(
@@ -138,6 +117,27 @@ async def get_posts_descubrir():
             }
         )
     return ret_posts
+
+@app.get("/posts/{id_post}", response_model=PostRespuesta)
+async def get_un_post(id_post: str):
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE id = %s;", (id_post,))
+            datos = cur.fetchall()
+            if not datos:
+                raise HTTPException(status_code=404, detail="Post no encontrado")
+            return post_row_to_json(datos[0])
+        
+@app.get("/posts/recientes", response_model=list[PostRespuesta])
+async def get_posts_recientes(post_reciente: PostReciente):
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE fecha > %s LIMIT 15;",
+                (post_reciente.fecha_creacion,)
+            )
+            datos = cur.fetchall()
+            return [post_row_to_json(row) for row in datos]
     
 @app.get("/comentarios", response_model=list[ComentarioRespuesta])
 async def get_comentarios():
