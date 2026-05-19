@@ -1,7 +1,8 @@
 import React from 'react';
 
 function Pin({ id, descripcion, url_imagen, nav}) {
-
+  descripcion = descripcion != null && descripcion.length > 20 ? descripcion.substring(0, 20) + "..." : descripcion;
+  
   return (
     <>
       <div 
