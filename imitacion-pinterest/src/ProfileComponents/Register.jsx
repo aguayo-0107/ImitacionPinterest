@@ -34,8 +34,6 @@ function Register () {
         alert("Error al conectar con el servidor.");
       }
     });
-    sessionStorage.setItem('user_session', JSON.stringify({ id: Date.now(), nombre_de_usuario: username.trim() }));
-    navigate('/profile');
   };
 
   return (
