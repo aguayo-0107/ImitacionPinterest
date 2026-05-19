@@ -1,9 +1,11 @@
 import Placeholder from '../assets/placeholder.png';
 import { useEffect, useState } from 'react';
 import { getPostsPorTablero } from '../funciones.js';
+import { useNavigate } from 'react-router-dom';
 
-function Board({id, nombre, nav}) {
+function Board({id, nombre}) {
   const [pines, setPines] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
     getPostsPorTablero(id)
       .then(data => {
@@ -17,7 +19,7 @@ function Board({id, nombre, nav}) {
   }, [id, nombre]);
 
   return (
-        <div className='card-container' style={{ cursor: 'pointer' }} onClick={nav}>
+        <div className='card-container' style={{ cursor: 'pointer' }} onClick={() => navigate(`/modboard/${id}`)}>
         <div key={id} className="card">
           <img src={pines[0]?.imagen_url || Placeholder} className="card-image" alt={pines[0]?.descripcion || "No disponible"} />
         </div>

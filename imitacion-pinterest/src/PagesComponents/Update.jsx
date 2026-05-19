@@ -47,7 +47,6 @@ function Update({type}) {
           // Verificar autenticación
           if (userLog && pinData.id_usuario === userLog.id) {
             setAuth(true);
-            
             // Cargar usuario
             getUsuarioPorId(pinData.id_usuario).then((userData) => {
               if (userData[0]) {
@@ -122,7 +121,7 @@ function Update({type}) {
     
     // Actualizar descripción si cambió
     if (descripcion.trim() !== "" && descripcion !== pin.descripcion) {
-      const result = await patchPost(descripcion, id, userLog.id);
+      const result = await patchPost(descripcion, pin.id, userLog.id);
       if (!result[0]) {
         alert("Error al actualizar la descripción: " + result[1]);
         return;
@@ -131,7 +130,7 @@ function Update({type}) {
     
     // Actualizar tablero si cambió
     if (tableroId !== "" && tableroId !== tableroActual?.id) {
-      const result = await patchTablero("", id, tableroId, userLog.id);
+      const result = await patchTablero("", pin.id, tableroId, userLog.id);
       if (!result[0]) {
         alert("Error al cambiar de tablero: " + result[1]);
         return;
@@ -144,9 +143,8 @@ function Update({type}) {
 
   const handleSubmitBoard = async (e) => {
     e.preventDefault();
-    
-    if (nombre.trim() !== "" && nombre !== board.nombre) {
-      const result = await patchTablero(nombre, undefined, id, userLog.id);
+    if (nombre.trim() !== "" && nombre !== board.nombre_tablero) {
+      const result = await patchTablero(nombre, "", board.id, userLog.id);
       if (!result[0]) {
         alert("Error al actualizar el tablero: " + result[1]);
         return;
@@ -244,7 +242,7 @@ function Update({type}) {
                     onChange={(e) => setDescripcion(e.target.value)}
                   />
                   
-                  <label className="form-label small fw-bold mt-3">Tablero del pin</label>
+                  <label className="form-label small fw-bold mt-3">Agrega el pin al tablero</label>
                   <select 
                     className="form-select" 
                     value={tableroId} 
