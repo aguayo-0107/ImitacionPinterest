@@ -15,6 +15,41 @@ load_dotenv()
 if not DB_CONNECTION_STRING:
     raise ValueError("La variable de entorno DB_CONNECTION_STRING no está definida")
 
+
+def usuario_row_to_json(row):
+    return {
+        "id": row[0],
+        "nombre_usuario": row[1]
+    }
+
+
+def post_row_to_json(row):
+    return {
+        "id": row[0],
+        "descripcion": row[1],
+        "imagen_url": row[2],
+        "id_usuario": row[3],
+        "fecha_creacion": row[4]
+    }
+
+
+def comentario_row_to_json(row):
+    return {
+        "id": row[0],
+        "contenido": row[1],
+        "id_post": row[2],
+        "id_usuario": row[3]
+    }
+
+
+def tablero_row_to_json(row):
+    return {
+        "id": row[0],
+        "nombre_tablero": row[1],
+        "id_usuario": row[2],
+        "posts": []
+    }
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,34 +59,44 @@ app.add_middleware(
 )
 
 # GET
-@app.get("/usuarios")
+@app.get("/usuarios", response_model=list[UsuarioRespuesta])
 async def get_usuarios():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, nombre_de_usuario, contrasena FROM Usuario;")
+            cur.execute("SELECT id, nombre_de_usuario FROM Usuario;")
             datos = cur.fetchall()
-            return datos
+            return [usuario_row_to_json(row) for row in datos]
 
-@app.get("/usuarios/{id_usuario}")
+@app.get("/usuarios/{id_usuario}", response_model=UsuarioRespuesta)
 async def get_un_usuario(id_usuario: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, nombre_de_usuario, contrasena FROM Usuario WHERE id = %s;", (id_usuario,))
+            cur.execute("SELECT id, nombre_de_usuario FROM Usuario WHERE id = %s;", (id_usuario,))
             datos = cur.fetchall()
             if not datos:
                 raise HTTPException(status_code=404, detail="Usuario no encontrado")
-            return datos[0]
+            return usuario_row_to_json(datos[0])
+        
+@app.get("/usuario", response_model=UsuarioRespuesta)
+async def get_un_usuario_nom_usuario(nombre_usuario: str, contrasena: str):
+    with psycopg.connect(DB_CONNECTION_STRING) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, nombre_de_usuario FROM Usuario WHERE nombre_de_usuario = %s AND contrasena = %s;", (nombre_usuario, contrasena))
+            datos = cur.fetchall()
+            if not datos:
+                raise HTTPException(status_code=404, detail="Usuario no encontrado")
+            return usuario_row_to_json(datos[0])
 
 #----------------POSTS------------------------
-@app.get("/posts")
+@app.get("/posts", response_model=list[PostRespuesta])
 async def get_posts():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post;")
             datos = cur.fetchall()
-            return datos
+            return [post_row_to_json(row) for row in datos]
 
-@app.get("/posts/{id_post}")
+@app.get("/posts/{id_post}", response_model=PostRespuesta)
 async def get_un_post(id_post: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
@@ -59,15 +104,18 @@ async def get_un_post(id_post: str):
             datos = cur.fetchall()
             if not datos:
                 raise HTTPException(status_code=404, detail="Post no encontrado")
-            return datos[0]
+            return post_row_to_json(datos[0])
         
-@app.get("/posts/recientes")
+@app.get("/posts/recientes", response_model=list[PostRespuesta])
 async def get_posts_recientes(post_reciente: PostReciente):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, descripcion, url_imagen, usuario_id from Post WHERE fecha > %s LIMIT 15;", (post_reciente.fecha_creacion,))
+            cur.execute(
+                "SELECT id, descripcion, url_imagen, usuario_id, fecha FROM Post WHERE fecha > %s LIMIT 15;",
+                (post_reciente.fecha_creacion,)
+            )
             datos = cur.fetchall()
-            return datos
+            return [post_row_to_json(row) for row in datos]
 
 @app.get("/posts/descubrir")
 async def get_posts_descubrir():
@@ -82,8 +130,8 @@ async def get_posts_descubrir():
     for post in posts:
         ret_posts.append(
             {
-                'id_post': post['id'],
-                'descripcion': post['description'],
+                'id': post['id'],
+                'descripcion': post.get('description'),
                 'imagen_url': post['links']['html'],
                 'fecha_creacion': post['created_at'],
                 'id_usuario': post['user']['id']
@@ -91,15 +139,15 @@ async def get_posts_descubrir():
         )
     return ret_posts
     
-@app.get("/comentarios")
+@app.get("/comentarios", response_model=list[ComentarioRespuesta])
 async def get_comentarios():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id, texto, post_id, usuario_id FROM Comentario;")
             datos = cur.fetchall()
-            return datos
+            return [comentario_row_to_json(row) for row in datos]
 
-@app.get("/comentarios/{id_comentario}")
+@app.get("/comentarios/{id_comentario}", response_model=ComentarioRespuesta)
 async def get_un_comentario(id_comentario: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
@@ -107,17 +155,17 @@ async def get_un_comentario(id_comentario: str):
             datos = cur.fetchall()
             if not datos:
                 raise HTTPException(status_code=404, detail="Comentario no encontrado")
-            return datos[0]
+            return comentario_row_to_json(datos[0])
 
-@app.get("/tableros")
+@app.get("/tableros", response_model=list[TableroRespuesta])
 async def get_tableros():
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id, nombre, usuario_id FROM Tablero;")
             datos = cur.fetchall()
-            return datos
+            return [tablero_row_to_json(row) for row in datos]
 
-@app.get("/tableros/{id_tablero}")
+@app.get("/tableros/{id_tablero}", response_model=TableroRespuesta)
 async def get_un_tablero(id_tablero: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
@@ -125,31 +173,34 @@ async def get_un_tablero(id_tablero: str):
             datos = cur.fetchall()
             if not datos:
                 raise HTTPException(status_code=404, detail="Tablero no encontrado")
-            return datos[0]
+            return tablero_row_to_json(datos[0])
 
-@app.get("/postsTablero/{id_tablero}")
+@app.get("/postsTablero/{id_tablero}", response_model=list[PostRespuesta])
 async def get_posts_tablero(id_tablero: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT post_id, tablero_id FROM TableroPosts WHERE tablero_id = %s;", (id_tablero,))
+            cur.execute(
+                "SELECT Post.id, Post.descripcion, Post.url_imagen, Post.usuario_id, Post.fecha FROM TableroPosts JOIN Post ON TableroPosts.post_id = Post.id WHERE TableroPosts.tablero_id = %s;",
+                (id_tablero,)
+            )
             datos = cur.fetchall()
-            return datos
+            return [post_row_to_json(row) for row in datos]
 
-@app.get("/tablerosUsuario/{id_usuario}")
+@app.get("/tablerosUsuario/{id_usuario}", response_model=list[TableroRespuesta])
 async def get_tableros_usuario(id_usuario: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id, nombre, usuario_id FROM Tablero WHERE usuario_id = %s;", (id_usuario,))
             datos = cur.fetchall()
-            return datos
+            return [tablero_row_to_json(row) for row in datos]
         
-@app.get("/comentariosPost/{id_post}")
+@app.get("/comentariosPost/{id_post}", response_model=list[ComentarioRespuesta])
 async def get_comentarios_post(id_post: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id, texto, post_id, usuario_id FROM Comentario WHERE post_id = %s;", (id_post,))
             datos = cur.fetchall()
-            return datos
+            return [comentario_row_to_json(row) for row in datos]
         
 # POST
 @app.post("/usuarios", status_code=201, response_model=UsuarioRespuesta)
@@ -160,7 +211,7 @@ async def crear_usuario(usuario: UsuarioCrear):
             cur.execute("INSERT INTO Usuario (id, nombre_de_usuario, contrasena) VALUES (%s, %s, %s);", (id_usuario, usuario.nombre_usuario, usuario.contrasena))
             conn.commit()
             return {
-                "id_usuario": id_usuario, 
+                "id": id_usuario, 
                 "nombre_usuario": usuario.nombre_usuario
             }
 
@@ -172,7 +223,7 @@ async def crear_post(post: PostCrear, usuario_id: str = Header(...)):
             cur.execute("INSERT INTO Post (id, descripcion, url_imagen, usuario_id, fecha) VALUES (%s, %s, %s, %s, %s);", (id_post, post.descripcion, post.imagen_url, usuario_id, post.fecha_creacion))
             conn.commit()
             return {
-                "id_post": id_post, 
+                "id": id_post, 
                 "descripcion": post.descripcion,
                 "imagen_url": post.imagen_url,
                 "fecha_creacion": post.fecha_creacion,
@@ -187,7 +238,7 @@ async def crear_comentario(comentario: ComentarioCrear, post_id: str, usuario_id
             cur.execute("INSERT INTO Comentario (id, texto, post_id, usuario_id) VALUES (%s, %s, %s, %s);", (id_comentario, comentario.contenido, post_id, usuario_id))
             conn.commit()
             return {
-                "id_comentario": id_comentario, 
+                "id": id_comentario, 
                 "contenido": comentario.contenido,
                 "id_post": post_id,
                 "id_usuario": usuario_id
@@ -201,7 +252,7 @@ async def crear_tablero(tablero: TableroCrear, usuario_id: str = Header(...)):
             cur.execute("INSERT INTO Tablero (id, nombre, usuario_id) VALUES (%s, %s, %s);", (id_tablero, tablero.nombre_tablero, usuario_id))
             conn.commit()
             return {
-                "id_tablero": id_tablero, 
+                "id": id_tablero, 
                 "nombre_tablero": tablero.nombre_tablero,
                 "id_usuario": usuario_id,
                 "posts": []
@@ -228,7 +279,7 @@ async def actualizar_post(post_id: str, post: PostActualizar, usuario_id: str = 
             fecha = res[0][2]
             
             return {
-                "id_post": post_id, 
+                "id": post_id, 
                 "descripcion": descripcion,
                 "imagen_url": imagen_url,
                 "fecha_creacion": fecha,
@@ -252,7 +303,7 @@ async def actualizar_usuario(id_usuario: str, usuario: UsuarioActualizar):
             nombre_usuario = res[0][0]
             
             return {
-                "id_usuario": id_usuario, 
+                "id": id_usuario, 
                 "nombre_usuario": nombre_usuario
             }          
             
@@ -291,7 +342,7 @@ async def actualizar_tablero(tablero_id: str, tablero: TableroActualizar, usuari
                 fecha_creacion = res[0][2]
                 usuario_id_post = res[0][3]
                 posts_lista_ret.append({
-                    "id_post": post[0],
+                    "id": post[0],
                     "descripcion": descripcion,
                     "fecha_creacion": fecha_creacion,
                     "imagen_url": imagen_url,
@@ -299,7 +350,7 @@ async def actualizar_tablero(tablero_id: str, tablero: TableroActualizar, usuari
                 })
             
             return {
-                "id_tablero": tablero_id, 
+                "id": tablero_id, 
                 "nombre_tablero": nombre_tablero,
                 "id_usuario": usuario_id,
                 "posts": posts_lista_ret
@@ -317,7 +368,6 @@ async def eliminar_usuario(id_usuario: str):
 async def eliminar_post(id_post: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM TableroPosts WHERE post_id = %s;", (id_post,))
             cur.execute("DELETE FROM Post WHERE id = %s;", (id_post,))
             conn.commit()
             
@@ -325,7 +375,6 @@ async def eliminar_post(id_post: str):
 async def eliminar_tablero(id_tablero: str):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM TableroPosts WHERE tablero_id = %s;", (id_tablero,))
             cur.execute("DELETE FROM Tablero WHERE id = %s;", (id_tablero,))
             conn.commit()
 
