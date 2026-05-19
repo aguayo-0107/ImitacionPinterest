@@ -168,14 +168,15 @@ async def get_un_comentario(id_comentario: str):
 @app.get("/tableros/paginacion", response_model=list[TableroRespuesta])
 async def get_tableros_pag(
     pagina: int = 1,
-    limite: int = 8
+    limite: int = 8,
+    usuario_id: str = Header(None)
 ):
     offset = (pagina - 1) * limite
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT id, nombre, usuario_id FROM Tablero LIMIT %s OFFSET %s;",
-                (limite, offset)
+                "SELECT id, nombre, usuario_id FROM Tablero WHERE usuario_id = %s LIMIT %s OFFSET %s;",
+                (usuario_id, limite, offset)
             )
             return [tablero_row_to_json(row) for row in cur.fetchall()]
 
