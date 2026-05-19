@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUsuarios, postUsuario } from '../funciones.js';
+import { postUsuario } from '../funciones.js';
 
 function Register () {
   const navigate = useNavigate();
@@ -10,29 +10,21 @@ function Register () {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    getUsuarios().then((data) => {
-      if (data[0]) {
-        if (data[1].some(u => u[1] === username.trim())) {
-          alert("Error: El nombre de usuario ya está en uso.");
-        } else if (password !== confirmation) {
-          alert("Error: Las contraseñas no coinciden.");
-        } else {
-          postUsuario(username.trim(), password ).then((data) => {
-            if (data[0]) {
-              sessionStorage.setItem('user_session', JSON.stringify({ id: data[1].id ,nombre_de_usuario: data[1].nombre_de_usuario }));
-              navigate('/profile');
-            }
-            else {
-              console.error("Error al registrar el usuario:", data[1]);
-              alert("Error al registrar el usuario.");
-            }
-          });
+    // Checamos si el nombre de usuario ya existe
+    if (password !== confirmation) {
+      alert("Error: Las contraseñas no coinciden.");
+    } else {
+      postUsuario(username.trim(), password ).then((data) => {
+        if (data[0]) {
+          sessionStorage.setItem('user_session', JSON.stringify({ id: data[1].id, nombre_de_usuario: data[1].nombre_de_usuario }));
+          navigate('/profile');
         }
-      } else {
-        console.error("Error al obtener los usuarios:", data[1]);
-        alert("Error al conectar con el servidor.");
-      }
-    });
+        else {
+          console.error("Error al registrar el usuario:", data[1]);
+          alert("Error al registrar el usuario.");
+        }
+      });
+    }
   };
 
   return (
