@@ -9,7 +9,7 @@
 Esta aplicación es una página web Full-Stack inspirada en el funcionamiento y la estética visual de Pinterest. El frontend está estructurado  utilizando **React**, **JavaScript** y **Bootstrap**, lo que permite una interfaz de usuario dinámica y responsiva. Entre sus características principales destacan:
 
 * **Autenticación y Perfiles:** Gestión de inicio de sesión de usuarios y despliegue de páginas de perfil personalizadas.
-* **Gestión de Estado y Persistencia:** Integración nativa con el *Local Storage* del navegador para retener configuraciones de sesión y preferencias visuales, como el Modo Oscuro.
+* **Gestión de Estado y Persistencia:** Integración nativa con el *Session Storage* y *Local Storage* del navegador para retener configuraciones de sesión y preferencias visuales, como el Modo Oscuro.
 * **Consumo Dinámico de Datos:** Implementación de paginación asíncrona e integración robusta con la API de Unsplash para la carga optimizada de imágenes (pines/posts) y su organización interactiva en tableros.
 
 Por su parte, el backend está diseñado en Python bajo una arquitectura modular (evidenciado por la separación en `main.py`, `modelos.py` para la definición del esquema de la base de datos y `conexion.py` para la capa de persistencia). Esta separación de responsabilidades asegura que el código sea escalable, mantenible y siga principios de diseño sólido.
