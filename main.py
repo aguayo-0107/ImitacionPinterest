@@ -62,10 +62,10 @@ async def get_un_post(id_post: str):
             return datos[0]
         
 @app.get("/posts/recientes")
-async def get_posts_recientes():
+async def get_posts_recientes(post_reciente: PostReciente):
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, descripcion, url_imagen, usuario_id ORDER BY fecha DESC LIMIT 15;")
+            cur.execute("SELECT id, descripcion, url_imagen, usuario_id from Post WHERE fecha > %s LIMIT 15;", (post_reciente.fecha_creacion,))
             datos = cur.fetchall()
             return datos
 
