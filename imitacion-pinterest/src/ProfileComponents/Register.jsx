@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import userData from '../datos/usuarios.json';
+import { getUsuarios, postUsuario } from '../funciones.js';
 
 function Register () {
   const navigate = useNavigate();
@@ -11,17 +11,29 @@ function Register () {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Checamos si el nombre de usuario ya existe
-    const usuario = userData.find(u => u.nombre_de_usuario === username.trim()) || "Desconocido";
-
-    if (usuario !== "Desconocido") {
-        alert("Error: El nombre de usuario ya está en uso.");
-    } else if (password !== confirmation) {
-        alert("Error: Las contraseñas no coinciden.");
-    } else {
-        // Aquí iría la lógica para registrar al usuario en la BD
-        localStorage.setItem('user_session', JSON.stringify({ id: Date.now(), nombre_de_usuario: username.trim() }));
-        navigate('/profile');
-    }
+    getUsuarios().then((data) => {
+      if (data[0]) {
+        if (data[1].some(u => u[1] === username.trim())) {
+          alert("Error: El nombre de usuario ya está en uso.");
+        } else if (password !== confirmation) {
+          alert("Error: Las contraseñas no coinciden.");
+        } else {
+          postUsuario(username.trim(), password ).then((data) => {
+            if (data[0]) {
+              localStorage.setItem('user_session', JSON.stringify({ id: Date.now(), nombre_de_usuario: username.trim() }));
+              navigate('/profile');
+            }
+            else {
+              console.error("Error al registrar el usuario:", data[1]);
+              alert("Error al registrar el usuario.");
+            }
+          });
+        }
+      } else {
+        console.error("Error al obtener los usuarios:", data[1]);
+        alert("Error al conectar con el servidor.");
+      }
+    });
   };
 
   return (

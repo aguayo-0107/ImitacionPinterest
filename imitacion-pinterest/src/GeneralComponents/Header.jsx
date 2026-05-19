@@ -1,9 +1,18 @@
 import { useState } from 'react'
 import { toggleTheme } from '../theme.js';
 import { NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import Logo from '../assets/Logo.svg';
 
-function Header({nombre_de_usuario = "Visitante"}) {
+function Header() {
+    const [nombre_de_usuario, set_nombre_de_usuario] = useState("Visitante");
+    const navigate = useNavigate();
+    useEffect(() => {
+        const session = localStorage.getItem('user_session');
+        const saved = localStorage.getItem('user_session');
+        set_nombre_de_usuario(saved ? JSON.parse(saved).nombre_de_usuario : "Visitante");
+    }, [navigate]);
   return (
     <>
         <nav className="navbar navbar-expand-lg bg-body-tertiary shadow-lg">
