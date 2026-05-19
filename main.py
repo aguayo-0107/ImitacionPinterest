@@ -17,6 +17,8 @@ if not DB_CONNECTION_STRING:
 
 app.add_middleware(
     CORSMiddleware,
+    # Hay que recordar cambiar esto a solo nuestra pagina
+    # allow_origins=["https://aguayo-0107.github.io/ImitacionPinterest/"],
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],

@@ -1,8 +1,8 @@
-import { StrictMode } from 'react'
+import React, { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import Header from './GeneralComponents/Header.jsx'
-import Mosaic from './PinComponents/Mosaic.jsx'
+import Mosaic from "./PinComponents/Mosaic";
 import PinDetail from './PinComponents/PinDetail.jsx'
 import ProfilePage from './ProfileComponents/ProfilePage.jsx'
 import Login from './ProfileComponents/Login.jsx'
@@ -19,16 +19,16 @@ import './theme.js'
 import pinesData from './datos/pines.json';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  //<StrictMode>
     <HashRouter>
       <Header />
       
       <Routes>
-        <Route path="/" element={<Mosaic pins={pinesData} />} />
+        <Route path="/" element={<Mosaic />} />
         <Route path="/pin/:id" element={
           <>
             <PinDetail /> 
-            <Mosaic pins={pinesData} />
+            <Mosaic />
             </>
         } />
         <Route path="/profile" element={<ProfilePage /> } />
@@ -45,6 +45,6 @@ createRoot(document.getElementById('root')).render(
         <Route path="*" element={<h2 className="text-center mt-5">404 - Página no encontrada</h2>} />
       </Routes>
     </HashRouter>
-  </StrictMode>,
+  //</StrictMode>,
 )
 
