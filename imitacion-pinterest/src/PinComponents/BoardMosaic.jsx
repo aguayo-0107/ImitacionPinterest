@@ -4,9 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 function BoardMosaic({boards}) {
     const navigate = useNavigate();
-    useEffect(() => {
-        //Aqui tenemos que implementar lo de que baje tableros y los guarde en localStorage
-    },[]);
     
     return (
     <div className="cascade-grid">
