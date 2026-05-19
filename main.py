@@ -338,7 +338,7 @@ async def actualizar_tablero(tablero_id: str, tablero: TableroActualizar, usuari
     with psycopg.connect(DB_CONNECTION_STRING) as conn:
         with conn.cursor() as cur:
             # Primero agregamos el post al tablero
-            if tablero.id_post is not None:
+            if tablero.id_post is not None and tablero.id_post != '':
                 cur.execute("INSERT INTO TableroPosts(post_id, tablero_id) VALUES(%s, %s);", (tablero.id_post, tablero_id))
                 conn.commit()
             
