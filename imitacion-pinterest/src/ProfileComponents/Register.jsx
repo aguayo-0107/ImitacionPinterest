@@ -10,7 +10,6 @@ function Register () {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Checamos si el nombre de usuario ya existe
     getUsuarios().then((data) => {
       if (data[0]) {
         if (data[1].some(u => u[1] === username.trim())) {
@@ -20,7 +19,7 @@ function Register () {
         } else {
           postUsuario(username.trim(), password ).then((data) => {
             if (data[0]) {
-              sessionStorage.setItem('user_session', JSON.stringify({ id: Date.now(), nombre_de_usuario: username.trim() }));
+              sessionStorage.setItem('user_session', JSON.stringify({ id: data[1].id ,nombre_de_usuario: data[1].nombre_de_usuario }));
               navigate('/profile');
             }
             else {
