@@ -59,7 +59,7 @@ function Update({type}) {
                     
                     // Encontrar el tablero actual del pin
                     const tableroDelPin = boardsData[1].find(b => 
-                      b.posts && b.posts.some(p => p.id === parseInt(id))
+                      b.posts && b.posts.some(p => p.id === id)
                     );
                     if (tableroDelPin) {
                       setTableroActual(tableroDelPin);
@@ -144,7 +144,6 @@ function Update({type}) {
   const handleSubmitBoard = async (e) => {
     e.preventDefault();
     if (nombre.trim() !== "" && nombre !== board.nombre_tablero) {
-      console.log("Intentando actualizar tablero con nombre:", nombre, board.id, userLog.id);
       const result = await patchTablero(nombre, "", board.id, userLog.id);
       if (!result[0]) {
         alert("Error al actualizar el tablero: " + result[1]);
@@ -157,7 +156,7 @@ function Update({type}) {
 
   const handleDeletePin = async () => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este pin?")) {
-      const result = await deletePost(parseInt(id));
+      const result = await deletePost(id);
       if (result[0]) {
         alert("Pin eliminado exitosamente");
         navigate('/');
@@ -169,7 +168,7 @@ function Update({type}) {
 
   const handleDeleteBoard = async () => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este tablero?")) {
-      const result = await deleteTablero(parseInt(id));
+      const result = await deleteTablero(id);
       if (result[0]) {
         alert("Tablero eliminado exitosamente");
         navigate('/');
@@ -247,7 +246,7 @@ function Update({type}) {
                   <select 
                     className="form-select" 
                     value={tableroId} 
-                    onChange={(e) => {setTableroId(e.target.value) }}
+                    onChange={(e) => setTableroId(e.target.value)}
                   >
                     <option value="">Selecciona un tablero</option>
                     {userBoards.map(b => (
@@ -305,7 +304,7 @@ function Update({type}) {
                     <input 
                       type="text"
                       className="form-control"
-                      placeholder={board.nombre}
+                      placeholder={board.nombre_tablero}
                       value={nombre}
                       onChange={(e) => setNombre(e.target.value)}
                     />
