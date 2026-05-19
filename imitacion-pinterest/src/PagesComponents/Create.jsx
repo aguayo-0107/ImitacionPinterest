@@ -108,6 +108,7 @@ function Create() {
                     required
                   >
                     <option value="">Selecciona un tablero destino</option>
+                    <option value="">Ninguno</option>
                     {userBoards.map(board => (
                       <option key={board.id} value={board.id.toString()}>{board.nombre}</option>
                     ))}

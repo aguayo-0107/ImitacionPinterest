@@ -16,7 +16,7 @@ function Register () {
     } else {
       postUsuario(username.trim(), password ).then((data) => {
         if (data[0]) {
-          sessionStorage.setItem('user_session', JSON.stringify({ id: data[1].id, nombre_de_usuario: username.trim() }));
+          sessionStorage.setItem('user_session', JSON.stringify({ id: data[1].id, nombre_de_usuario: data[1].nombre_de_usuario }));
           navigate('/profile');
         }
         else {

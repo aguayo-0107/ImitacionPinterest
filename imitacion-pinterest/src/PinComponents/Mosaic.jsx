@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 function Mosaic({posts}) {
     const navigate = useNavigate();
-    
     return (
     <>
       { posts !== undefined && posts[0] ? (

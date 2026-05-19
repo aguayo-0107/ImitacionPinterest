@@ -12,6 +12,7 @@ function Header() {
         const session = sessionStorage.getItem('user_session');
         set_nombre_de_usuario(session ? JSON.parse(session).nombre_de_usuario : "Visitante");
     }, [navigate]);
+    
   return (
     <>
         <nav className="navbar navbar-expand-lg bg-body-tertiary shadow-lg">

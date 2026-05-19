@@ -7,7 +7,7 @@ class UsuarioCrear(BaseModel):
     contrasena: str = Field(min_length=3, max_length=30)
 
 class UsuarioRespuesta(BaseModel):
-    id_usuario: str
+    id: str
     nombre_usuario: str
 
 class UsuarioActualizar(BaseModel):
@@ -18,9 +18,12 @@ class PostCrear(BaseModel):
     descripcion: Optional[str] = Field(default=None, max_length=500)
     imagen_url: str = Field(max_length=700)
     fecha_creacion: datetime = Field(default_factory=datetime.now)
-
+    
+class PostReciente(BaseModel):
+    fecha_creacion: datetime
+    
 class PostRespuesta(BaseModel):
-    id_post: str
+    id: str
     descripcion: Optional[str]
     imagen_url: str
     fecha_creacion: datetime
@@ -34,16 +37,17 @@ class ComentarioCrear(BaseModel):
     #id post se obtiene del header
 
 class ComentarioRespuesta(BaseModel):
-    id_comentario: str 
+    id: str 
     contenido: str
     id_post: str
     id_usuario: str
+    nombre_usuario: str
 
 class TableroCrear(BaseModel):
     nombre_tablero: str = Field(max_length=200)
 
 class TableroRespuesta(BaseModel):
-    id_tablero: str
+    id: str
     nombre_tablero: str
     id_usuario: str
     posts: Optional[list[dict]] = None
