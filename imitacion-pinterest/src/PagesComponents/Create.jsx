@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { postPost, patchTablero, postTablero, getTablerosPorUsuario } from '../funciones.js';
 
 function Create() {
   const navigate = useNavigate();
@@ -14,14 +15,19 @@ function Create() {
   const [selectedBoard, setSelectedBoard] = useState('');
 
   const [boardName, setBoardName] = useState('');
-  const [boardDescription, setBoardDescription] = useState('');
 
   useEffect(() => {
     const session = sessionStorage.getItem('user_session');
     if (session) {
       const parsedSession = JSON.parse(session);
       setUserSession(parsedSession);
-      setUserBoards(parsedSession.boards || []);
+      getTablerosPorUsuario(parsedSession.id).then((tableros) => {
+        if (tableros[0]) {
+          setUserBoards(tableros[1]);
+        } else {
+          alert("Error al cargar tus tableros.");
+        }
+      });
     } else {
       navigate('/profile');
     }
@@ -30,25 +36,60 @@ function Create() {
   const handleCreatePin = (e) => {
     e.preventDefault();
 
-    // Aquí iría la lógica para crear el pin y asociarlo al tablero seleccionado en la BD
-    alert(`¡Pin "${pinTitle}" creado con éxito en tu colección!`);
+    if (!userSession) {
+      alert('Debe iniciar sesión para crear un pin.');
+      navigate('/profile');
+      return;
+    }
+    if (selectedBoard === '') {
+      alert("Seleccione un tablero o la opción 'Ninguno' para guardar el pin.");
+    }
+    else {
+      postPost(pinDescription, pinImage, userSession.id).then((data) => {
+        if (data[0]) {
+          if (selectedBoard === 'none') {
+            alert(`¡Pin "${pinDescription}" creado con éxito en tu colección!`);
+            navigate('/profile');
+          } else {
+            const newPinId = data[1].id;
+            patchTablero('', newPinId, selectedBoard, userSession.id).then((res) => {
+              if (res[0]) {
+                alert(`¡Pin "${pinDescription}" creado con éxito en tu colección!`);
+              } else {
+                alert("Error al agregar el pin al tablero.");
+              }
+              navigate('/profile');
+            });
+          }
+        } else {
+          alert("Error al crear el pin.");
+        }
+      });
+    }
     
     // Resetear formulario y redirigir al perfil para ver los cambios
-    setPinTitle('');
     setPinDescription('');
     setPinImage('');
     setSelectedBoard('');
-    navigate('/profile');
   };
 
   const handleCreateBoard = (e) => {
     e.preventDefault();
 
-    // Aquí iría la lógica para crear el tablero en la BD
-    alert(`¡Tablero "${boardName}" creado con éxito!`);
+    if (!session) {
+      alert('Debe iniciar sesión para crear un tablero.');
+      navigate('/profile');
+      return;
+    }
+    postTablero(boardName, userId).then((data) => {
+      if (data[0]) {
+        alert(`¡Tablero "${boardName}" creado con éxito!`);
+      } else {
+        alert("Error al crear el tablero.");
+      }
+    });
     
     setBoardName('');
-    setBoardDescription('');
     navigate('/profile');
   };
 
@@ -107,10 +148,10 @@ function Create() {
                     onChange={(e) => setSelectedBoard(e.target.value)}
                     required
                   >
+                    <option value="none">Ninguno</option>
                     <option value="">Selecciona un tablero destino</option>
-                    <option value="">Ninguno</option>
                     {userBoards.map(board => (
-                      <option key={board.id} value={board.id.toString()}>{board.nombre}</option>
+                      <option key={board.id} value={board.id.toString()}>{board.nombre_tablero}</option>
                     ))}
                   </select>
                 </div>
